@@ -1,0 +1,162 @@
+/* max photography - landscape.css */
+
+/* header */
+#header {
+	position: relative;
+	overflow: hidden;
+	min-width: 840px;
+}
+
+#header > * {
+	display: inline-block;
+}
+
+#header > #logo {
+	height: 70px;
+	text-align: right;
+	font-size: 42pt;
+	margin-right: 100px;
+	padding-left: 30px;
+}
+
+#header > #lang {
+	position: absolute;
+	right: 20px;
+	padding: 8px 10px;
+	cursor: pointer;
+	border-bottom: 1px solid #000;
+}
+
+#header > #lang:hover {
+	background-color: #eeeeee;
+}
+
+#header > #lang > span {
+
+}
+
+#header > #lang > ul {
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+#header > #lang > ul > li {
+	display: none;
+	cursor: pointer;
+}
+
+#header > #admin {
+	position: absolute;
+	right: 70px;
+	padding: 8px 10px;
+	cursor: pointer;
+	border-bottom: 1px solid #000;
+}
+
+#header > #admin:hover {
+	background-color: #eeeeee;
+}
+
+#header > #admin > a {
+	color: #000;
+	text-decoration: none;
+}
+
+#container {
+	min-width: 825px;
+}
+
+/* menu */
+#menu {
+	display: inline-block;
+	/* border-right: 1px solid #000; */
+	height: 400px;
+	width: 160px;
+	float: left;
+	margin-top: 66px;
+}
+
+#menu > b {
+
+}
+
+#menu > ul {
+	margin: 20px;
+	padding: 0;
+	list-style: none;
+}
+
+#menu > ul > li {
+	margin: 0;
+	cursor: pointer;
+	padding-top: 12px;
+	margin-bottom: 20px;
+	border-bottom: 1px solid #000;
+	text-transform: capitalize;
+	overflow-x: hidden;
+}
+
+#menu > ul > li > a {
+	color: #000;
+	text-decoration: none;
+	padding-right: 100px;
+	padding-top: 14px;
+}
+
+#menu > ul > li:hover {
+	list-style-type: square;
+	background-color: #eeeeee;
+}
+
+/* content */
+#content {
+	display: inline-block;
+	float: left;
+	border-bottom: 1px solid #000;
+	min-height: 500px;
+	height: 80%;
+	width: 80%;
+	margin-left: 4px;
+}
+
+#content:hover {
+	background-color: #666666;
+}
+
+#content > #title {
+	background-color: #fff;
+	padding-left: 30px;
+	font-size: 21pt;
+	border-bottom: 1px solid #000;
+	text-transform: capitalize;
+}
+
+#content > #gallery {
+	cursor: pointer;
+	overflow-y: hidden;
+	overflow-x: scroll;
+	width: auto;
+	margin-top: 23px;
+	height: 420px;
+	background-color: #000;
+	white-space: nowrap;
+}
+
+#content > #gallery > * {
+	overflow-y: hidden;
+	display: inline-block;
+  white-space: normal;
+	background: #000 no-repeat center;
+	width: 400px;
+	height: 420px;
+	/*background-size: 400px auto;*/
+	margin:-12px 10px 0 10px !important;
+}
+
+#content > #gallery > #load {
+	width: 30px;
+	height: 430px;
+	border: 1px solid #eeeeee;
+	margin:0;
+}
