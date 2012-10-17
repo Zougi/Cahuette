@@ -17,6 +17,7 @@
 	font-size: 42pt;
 	margin-right: 100px;
 	padding-left: 30px;
+	text-shadow: 2px 2px 4px #999;
 }
 
 #header > #lang {
@@ -95,6 +96,7 @@
 	border-bottom: 1px solid #000;
 	text-transform: capitalize;
 	overflow-x: hidden;
+	line-height: 20px;
 }
 
 #menu > ul > li > a {
@@ -104,8 +106,15 @@
 	padding-top: 14px;
 }
 
+#menu > ul > li > a:active
+{
+	outline: none;
+}
+
 #menu > ul > li:hover {
 	list-style-type: square;
+	padding-left: 15px;
+	font-size: 13pt;
 	background-color: #eeeeee;
 }
 
@@ -118,14 +127,25 @@
 	height: 80%;
 	width: 80%;
 	margin-left: 4px;
+	position: relative;
+	color: #fff;
 }
 
 #content:hover {
-	background-color: #666666;
+	color: #000;
+	background: #ffffff;
+	background: -moz-linear-gradient(top,  #ffffff 0%, #000000 80%, #ffffff 100%);
+	background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#ffffff), color-stop(80%,#000000), color-stop(100%,#ffffff));
+	background: -webkit-linear-gradient(top,  #ffffff 0%,#000000 80%,#ffffff 100%);
+	background: -o-linear-gradient(top,  #ffffff 0%,#000000 80%,#ffffff 100%);
+	background: -ms-linear-gradient(top,  #ffffff 0%,#000000 80%,#ffffff 100%);
+	background: linear-gradient(to bottom,  #ffffff 0%,#000000 80%,#ffffff 100%);
+	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffffff', endColorstr='#ffffff',GradientType=0 );
 }
 
 #content > #title {
 	background-color: #fff;
+	color: #000;
 	padding-left: 30px;
 	font-size: 21pt;
 	border-bottom: 1px solid #000;
@@ -143,7 +163,7 @@
 	white-space: nowrap;
 }
 
-#content > #gallery > * {
+#content > #gallery > .img {
 	overflow-y: hidden;
 	display: inline-block;
   white-space: normal;
@@ -155,8 +175,27 @@
 }
 
 #content > #gallery > #load {
+	display: inline-block;
+  white-space: normal;
 	width: 30px;
 	height: 430px;
 	border: 1px solid #eeeeee;
 	margin:0;
 }
+
+#content > #gallery_bar {
+	position: absolute;
+	right: 0;	
+}
+
+#content > #gallery_bar > * {
+	display: inline-block;
+  white-space: normal;
+	margin-right: 20px;
+}
+
+#content > #gallery_bar >:first-child {
+	margin-right: 60px;
+	color: #000;
+}
+

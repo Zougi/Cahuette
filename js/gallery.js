@@ -91,3 +91,16 @@ function add_menu_section(name, e_menu, e_ul, e_li) {
 	e_ul.insertBefore(e_li, e_ul.children[1]);
 }
 
+//nbr of time div has been scrolled to the right
+var nb_scroll = 0;
+
+//trigger whenever gallery has been fully scrolled to the right
+document.getElementById('gallery').addEventListener('scroll', function() {
+	var e_gallery = document.getElementById('gallery');
+	
+	if (e_gallery.scrollWidth - e_gallery.offsetWidth <= e_gallery.scrollLeft)
+	{
+		var all_imgs = e_gallery.getElementsByClassName('img');
+	    console.log('scrolled');
+	}
+});
