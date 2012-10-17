@@ -60,8 +60,7 @@ function add_menu_section(name, e_menu, e_ul, e_li) {
 	var e_li = document.createElement('li'),
 			e_a = document.createElement('a'),
 			e_a_attr = document.createAttribute('href'),
-			e_gallery = document.getElementById('gallery'),
-			e_title = document.getElementById('title');
+			e_gallery = document.getElementById('gallery');
 	
 	e_a.innerHTML = name;
 
@@ -76,9 +75,6 @@ function add_menu_section(name, e_menu, e_ul, e_li) {
 				e_gallery.removeChild(all_imgs[all_imgs.length - 1]);
 			}
 		}
-		
-		//name gallery
-		e_title.innerHTML = name;
 		
 		//add section's imgages to gallery
 		for (var img in gallery[name]) {
