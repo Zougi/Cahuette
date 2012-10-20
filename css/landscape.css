@@ -1,5 +1,10 @@
 /* max photography - landscape.css */
 
+@font-face {  
+  font-family: kin668;  
+  src: url(kin668.ttf) format("truetype");  
+}
+
 body {
 	background: rgba(0, 0, 0, 0.05);
 }
@@ -17,10 +22,10 @@ body {
 
 #header > #logo {
 	height: 70px;
-	text-align: center;
 	font-size: 42pt;
-	width: 100%;
+	width: 525px;
 	text-shadow: 2px 2px 4px #999;
+	font-family: kin668;
 }
 
 #header > #lang {
@@ -81,8 +86,9 @@ body {
 	margin-top: 66px;
 }
 
-#menu > b {
-
+#menu > input {
+	width: 100px;
+	margin-right: 10px;
 }
 
 #menu > ul {
@@ -93,6 +99,7 @@ body {
 
 #menu > ul > li {
 	margin: 0;
+	position: relative;
 	cursor: pointer;
 	text-transform: capitalize;
 	overflow-x: hidden;
@@ -115,6 +122,19 @@ body {
 	padding-left: 15px;
 	font-size: 13pt;
 	background-color: #eeeeee;
+}
+
+#menu > ul > li > button {
+	position: absolute;
+	top: 0;
+	right: 0;
+}
+
+#menu > button:last-child {
+	display: block;
+	width: 80%;
+	margin: auto;
+	margin-top: 40px;
 }
 
 /* content */
@@ -150,6 +170,15 @@ body {
 	margin:-12px 0 0 7px !important;
 }
 
+#content > #gallery > .img > span {
+	border: 5px dashed black;
+	width: 640px;
+	height: 95%;
+	margin-top: 12px;
+	position: relative;
+	display: block;
+}
+
 #content > #gallery > #load {
 	display: inline-block;
   white-space: normal;
@@ -175,3 +204,51 @@ body {
 	color: #000;
 }
 
+
+
+#logbox {
+	position: absolute;
+	display: none;
+	width: 200px;
+	height: 100px;
+	top: 40%;
+	left: 40%;
+	text-align: center;
+	background: grey;
+	padding-bottom: 20px;
+}
+
+#logbox > fieldset {
+	border: 1px dashed #000;
+}
+
+#logbox > fieldset > legend {
+		text-align: left;
+}
+
+#logbox > fieldset >:nth-child(3) {
+	margin-top: 10px;
+}
+
+#logbox > fieldset >:last-child {
+	margin-top: 10px;
+}
+
+#logbox > button {
+	position: absolute;
+	top: 0;
+	right: 0;
+}
+
+.remove {
+	display: none !important;
+}
+
+.add {
+	display: block !important;
+}
+
+.bt_upload {
+	display: block;
+	color: #000;
+}

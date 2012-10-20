@@ -1,25 +1,22 @@
 /* max photography - gallery.js */
-var debug = true;
+var max_gallery = 3;
+var gallery, section;
 
-var mql = window.matchMedia("only screen and (max-width:720px)");
-mql.addListener(function(m) {
-  console.log('little screen');
-});
+/* get obj gallery from json */
+function get_gallery(success) {
+	var xhr = new XMLHttpRequest();
+	xhr.open('GET', 'gallery.json', true);
+	xhr.onreadystatechange = function(r) {
+		r = r.target;
+		if (r.readyState == 4 /* complete */) {
+			var result = JSON.parse(r.responseText);
+			success(result);
+		}
+	};
+	xhr.send();
+}
 
-var gallery;
-
-/* fill gallery and menu */
-var xhr = new XMLHttpRequest();
-xhr.open('GET', 'gallery.json', true);
-xhr.onreadystatechange = function() {
-  if (xhr.readyState == 4 /* complete */) {
-    var result = JSON.parse(xhr.responseText);
-		gallery = result;
-		fill_menu(result);
-  }
-};
-xhr.send();
-
+/* add an image to the gallery */
 function add_img_gallery(img) {
 	var e_gallery = document.getElementById('gallery'),
 			e_load = document.getElementById('load'),
@@ -34,24 +31,26 @@ function add_img_gallery(img) {
 	e_img.setAttributeNode(e_img_attr);
 	
 	e_gallery.insertBefore(e_img, e_load);
-	// if (debug) {
-	// 	console.log(img);
-	// }
 }
 
 /* fill the menu*/
 function fill_menu(result) {
 	var e_menu = document.getElementById('menu'),
 			e_ul = e_menu.getElementsByTagName('ul')[0];
-			
-	var sections = [];
-	for (var section_name in result) {
-		sections.push(section_name);
+	result = Object.keys(result);
+	for (var section in result) {
+		add_menu_section(result[section], e_menu, e_ul);
 	}
-	var nb_sections = sections.length;
-	var section;
-	while ((section = sections.pop()) != null) {
-		add_menu_section(section, e_menu, e_ul);
+}
+
+/* add images to gallery */
+function generate_gallery(gallery, name, max) {
+	var i = 0;
+	for (var img in gallery[name]) {
+		if (i++ > max) {
+			break;
+		}
+		add_img_gallery(gallery[name][img]);
 	}
 }
 
@@ -77,26 +76,74 @@ function add_menu_section(name, e_menu, e_ul, e_li) {
 		}
 		
 		//add section's imgages to gallery
-		for (var img in gallery[name]) {
-			add_img_gallery(gallery[name][img]);
-		}
+		generate_gallery(gallery, name, max_gallery);
+		
+		section = name;
 		//console.log(gallery[name]);
 	});
 	e_li.appendChild(e_a);
 	
-	e_ul.insertBefore(e_li, e_ul.children[1]);
+	e_ul.appendChild(e_li);
 }
-
-//nbr of time div has been scrolled to the right
-var nb_scroll = 0;
 
 //trigger whenever gallery has been fully scrolled to the right
 document.getElementById('gallery').addEventListener('scroll', function() {
 	var e_gallery = document.getElementById('gallery');
-	
+
 	if (e_gallery.scrollWidth - e_gallery.offsetWidth <= e_gallery.scrollLeft)
 	{
-		var all_imgs = e_gallery.getElementsByClassName('img');
-	    console.log('scrolled');
+		var nb_all_imgs = e_gallery.getElementsByClassName('img').length,
+				nb_gallery = gallery[section].length;
+
+	 	if (nb_gallery > nb_all_imgs) {
+			var i = 0;
+			while (nb_gallery == nb_all_imgs || i == 2) {
+				add_img_gallery[nb_all_imgs + i++];
+			}
+		}
 	}
 });
+
+
+//get arg in url after #
+function get_UrlArg() {
+	var loc = window.location.href;
+	var loc_separator = loc.indexOf('#');
+	return (loc_separator == -1) ? '' : loc.substr(loc_separator + 1);
+}
+section = get_UrlArg();
+
+
+//fill menu and gallery
+get_gallery(function(result) {
+		gallery = result;
+		fill_menu(gallery);
+		var keys = Object.keys(gallery);
+		section = (keys.indexOf(section) != -1) ? section : keys[0];
+		generate_gallery(gallery, section, max_gallery);
+		init();
+});
+
+
+//drag gallery
+var dragged, offsetX,
+		e_gallery = document.getElementById('gallery');
+
+e_gallery.onmousedown = function(event) {
+    if (event.button == 2) return;
+    dragged = true;
+    offsetX = event.screenX - this.offsetLeft;
+    return false;
+}
+
+document.onmousemove = function(event) {
+	if (dragged) {
+		e_gallery.scrollLeft = e_gallery.scrollLeft - (event.screenX - offsetX) / 7;
+	}
+} 
+     
+document.onmouseup = function() {
+  if (dragged) {
+		dragged = false;
+  }
+}
