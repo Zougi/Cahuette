@@ -4,6 +4,7 @@ function admin_display() {
 	var e_bt,
 			e_logbox = document.getElementById('logbox'),
 			e_menu = document.getElementById('menu'),
+			e_content = document.getElementById('content'),
 			e_ul = e_menu.getElementsByTagName('ul')[0];
 			ez_li = e_ul.getElementsByTagName('li'),
 	 		attr = document.createAttribute('class');
@@ -39,6 +40,11 @@ function admin_display() {
 
 	e_bt = document.createElement('button');
 	e_bt.addEventListener('click', function(event) {
+		if (e_input.value == '') {
+			alert("Supply a category name");
+			return;
+		}
+		
 		add_menu_section(e_input.value, e_menu, e_ul);
 		
 		e_bt = document.createElement('button');
@@ -54,6 +60,10 @@ function admin_display() {
 		ez_li = e_ul.getElementsByTagName('li');
 		ez_li[ez_li.length - 1].appendChild(e_bt);
 		
+		clear_gallery();
+		alert('The new section will be saved after you added one image or more');
+		window.history.pushState(null, document.title, '#' +  e_input.value);
+		section = e_input.value;
 		e_input.value = '';
 	});
 	e_bt.appendChild(document.createTextNode('add'));
@@ -68,7 +78,7 @@ function admin_display() {
 	});
 	e_menu.appendChild(e_bt);
 	
-	//upload file
+	//upload files
 	var e_input_u = document.createElement('input');
 	
 	attr = document.createAttribute('type');
@@ -86,7 +96,43 @@ function admin_display() {
 	attr.nodeValue = 'bt_upload';
 	e_input_u.setAttributeNode(attr);
 	e_input_u.addEventListener('change', handleFileSelect, false);
-	document.getElementById('content').appendChild(e_input_u);
+	e_content.appendChild(e_input_u);
+	
+	//remove files
+	e_bt = document.createElement('button');
+	attr = document.createAttribute('class');
+	attr.nodeValue = 'bt_upload';
+	e_bt.setAttributeNode(attr);
+	e_bt.appendChild(document.createTextNode('remove'));
+	e_bt.addEventListener('click', function(event) {
+		var ez_div = document.querySelectorAll('.img');
+		var urlz = []; 
+		for (var i = 0; i < ez_div.length; i++) {
+			if (ez_div[i].hasChildNodes()) {
+				var url = window.getComputedStyle(ez_div[i]).getPropertyValue('background-image');
+				url = 'gallery/' + url.replace(/^url\(["']?.*(\\|\/)/, '').replace(/["']?\)$/, '');
+				urlz.push(url);
+			}
+		}
+		var formData = new FormData();
+
+		formData.append('token', localStorage.getItem('token'));
+		formData.append('section', section);
+		for (var i = 0; i < urlz.length; i++) {
+			formData.append('url' + i, urlz[i]);	
+		}
+		
+	  var xhr = new XMLHttpRequest();
+	  xhr.open('POST', 'api/gallery/remove.php', true);
+	  xhr.onreadystatechange = function() {
+			if (xhr.readyState == 4 /* complete */) {
+	      console.log(xhr.responseText);
+				window.location.reload();
+	    }
+		};
+	  xhr.send(formData);
+	});
+	e_content.appendChild(e_bt);
 }
 
 //button close logbox
@@ -167,12 +213,12 @@ function handleFileSelect(event) {
 
 		for (var file in files) {
 			if (file.type != undefined && !file.type.match('image.*')) {
-				alert('Files must images');
+				alert('Files must be images');
 				return;
 			}
 		}
 		send_img(section || url_tag || Object.keys(gallery)[0], files, function(reponse) {
-			window.location.reload();
+			window.location.href = '#' + section;
 		});
 	} catch(e) {
 		if (typeof debug != 'undefined' && debug) {

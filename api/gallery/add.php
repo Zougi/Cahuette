@@ -12,18 +12,23 @@ error_reporting(E_ALL);
 function add_to_gallery_json($section, $img_json) {
 	$inObj = false;
   $gallery = load_gallery_json();
-	foreach ($gallery as $key => $value) {
-		if ($section == $key && $inObj == false) {
-			array_push($gallery[$section], $img_json);
-			$inObj = true;
+
+	if ($gallery != null) {
+		foreach ($gallery as $key => $value) {
+			if ($section == $key && $inObj == false) {
+				array_push($gallery[$section], $img_json);
+				$inObj = true;
+				break;
+			}
 		}
 	}
 	//create new section
 	if ($inObj == false) {
-		array_push($gallery, $section);
-		foreach ($imgz_json as $key => $value) {
-			array_push($gallery[$section], $value);
+		//is first section
+		if ($gallery == null) {
+			$gallery = array();
 		}
+		$gallery[$section] = $img_json;
 	}
 	save_gallery_json($gallery);
 }
@@ -32,14 +37,16 @@ if (isset($_POST['token']) && isset($_POST['section'])) {
 	if ($_POST['token'] != $_SESSION['token']) {
 		display_error("invalid token");
 	} else {
+		$img_json = [];
 		foreach ($_FILES as $key => $value) {
 			$filename = uniqid() . '.' . pathinfo($value['name'], PATHINFO_EXTENSION);
 			move_uploaded_file($value['tmp_name'], '../../gallery/' . $filename);
-			add_to_gallery_json($_POST['section'], (object)array(
+			$img_json[] = (object)array(
 			    "name" => pathinfo($value['name'], PATHINFO_BASENAME),
 			    "url" => 'gallery/' . $filename,
-			));
+			);
 		}
+		add_to_gallery_json($_POST['section'], $img_json);
 		display_success();
 	}
 } else {

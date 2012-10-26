@@ -4,13 +4,29 @@ var gallery, section;
 
 /* get obj gallery from json */
 function get_gallery(success) {
+	get_storage('storage/gallery.json', success, function() {
+		init();
+	});
+}
+
+/* get obj text from json */
+function get_text(success) {
+	get_storage('storage/text.json', success);
+}
+
+/* get json file */
+function get_storage(text, success, error) {
 	var xhr = new XMLHttpRequest();
-	xhr.open('GET', 'gallery.json', true);
+	xhr.open('GET', text, true);
 	xhr.onreadystatechange = function(r) {
 		r = r.target;
 		if (r.readyState == 4 /* complete */) {
-			var result = JSON.parse(r.responseText);
-			success(result);
+			if (r.responseText != "") {
+				var result = JSON.parse(r.responseText);
+				success(result);
+			} else {
+				error();
+			}
 		}
 	};
 	xhr.send();
@@ -30,6 +46,17 @@ function add_img_gallery(img) {
 	e_img_attr.nodeValue = 'img';
 	e_img.setAttributeNode(e_img_attr);
 	
+	e_img.addEventListener('click', function(event) {
+		var token = localStorage.getItem('token');
+		if (token != undefined && token != null) {
+			if (event.target.nodeName.toLowerCase() != 'span') {
+				event.target.appendChild(document.createElement('span'));
+			} else {
+				event.target.parentNode.removeChild(event.target);
+			}
+		}
+	})
+	
 	e_gallery.insertBefore(e_img, e_load);
 }
 
@@ -47,10 +74,19 @@ function fill_menu(result) {
 function generate_gallery(gallery, name, max) {
 	var i = 0;
 	for (var img in gallery[name]) {
-		if (i++ > max) {
+		if (i++ > max - 1) {
 			break;
 		}
 		add_img_gallery(gallery[name][img]);
+	}
+}
+
+function clear_gallery() {
+	var all_imgs = e_gallery.getElementsByClassName('img');
+	if (all_imgs.length > 0) {
+		while (all_imgs.length != 0) {
+			e_gallery.removeChild(all_imgs[all_imgs.length - 1]);
+		}
 	}
 }
 
@@ -68,12 +104,7 @@ function add_menu_section(name, e_menu, e_ul, e_li) {
 	
 	e_a.addEventListener('click', function() {
 		//remove previous images in gallery
-		var all_imgs = e_gallery.getElementsByClassName('img');
-		if (all_imgs.length > 0) {
-			while (all_imgs.length != 0) {
-				e_gallery.removeChild(all_imgs[all_imgs.length - 1]);
-			}
-		}
+		clear_gallery();
 		
 		//add section's imgages to gallery
 		generate_gallery(gallery, name, max_gallery);
@@ -87,23 +118,31 @@ function add_menu_section(name, e_menu, e_ul, e_li) {
 }
 
 //trigger whenever gallery has been fully scrolled to the right
-document.getElementById('gallery').addEventListener('scroll', function() {
-	var e_gallery = document.getElementById('gallery');
+var e_gallery = document.getElementById('gallery');
+if (e_gallery != null) {
+	e_gallery.addEventListener('scroll', function() {
+		if (e_gallery.scrollWidth - e_gallery.offsetWidth <= e_gallery.scrollLeft)
+		{
+			var nb_all_imgs = e_gallery.getElementsByClassName('img').length,
+					nb_gallery = gallery[section].length;
+		 	if (nb_gallery > nb_all_imgs) {
+				var attr = document.createAttribute('class');
+				attr.nodeValue = 'add_inline'
+				document.getElementById('load').setAttributeNode(attr);
 
-	if (e_gallery.scrollWidth - e_gallery.offsetWidth <= e_gallery.scrollLeft)
-	{
-		var nb_all_imgs = e_gallery.getElementsByClassName('img').length,
-				nb_gallery = gallery[section].length;
-
-	 	if (nb_gallery > nb_all_imgs) {
-			var i = 0;
-			while (nb_gallery == nb_all_imgs || i == 2) {
-				add_img_gallery[nb_all_imgs + i++];
+				var i = 0;
+				while (nb_gallery > nb_all_imgs + i || i == 2) {
+					add_img_gallery(gallery[section][nb_all_imgs + i++]);
+				}
+			}
+			if (nb_gallery == nb_all_imgs) {
+				var attr = document.createAttribute('class');
+				attr.nodeValue = 'remove'
+				document.getElementById('load').setAttributeNode(attr);
 			}
 		}
-	}
-});
-
+	});
+}
 
 //get arg in url after #
 function get_UrlArg() {
@@ -147,3 +186,15 @@ document.onmouseup = function() {
 		dragged = false;
   }
 }
+
+//loader
+var count = 0;
+window.setInterval(function() {
+  var e_div = document.getElementById('loader');
+  e_div.style.MozTransform = 'scale(0.5) rotate(' + count + 'deg)';
+  e_div.style.WebkitTransform = 'scale(0.5) rotate(' + count + 'deg)';
+  if (count == 360) {
+		count = 0
+	}
+  count += 45;
+}, 70);
