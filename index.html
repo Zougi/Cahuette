@@ -11,13 +11,6 @@
 </head>
 <body>
 	<div id="fb-root"></div>
-	<script>(function(d, s, id) {
-	  var js, fjs = d.getElementsByTagName(s)[0];
-	  if (d.getElementById(id)) return;
-	  js = d.createElement(s); js.id = id;
-	  js.src = "//connect.facebook.net/fr_FR/all.js#xfbml=1&appId=405747459487893";
-	  fjs.parentNode.insertBefore(js, fjs);
-	}(document, 'script', 'facebook-jssdk'));</script>
 	<div id="header">
 		<div id="logo" title="logo">Maxime Stephanovitch</div>
 		<div id="contact"><a href="contact.html">Contact</a></div>
@@ -27,7 +20,7 @@
 			<ul>
 			</ul>
 		<!-- end menu --></div>
-		<div id="content">
+		<div id="content" class="shadow">
 			<div id="gallery">
 				<div id="load">
 					<div id="loader">
@@ -44,20 +37,28 @@
 				<div style="clear:both;"></div>
 			<!-- end gallery --></div>
 		<!-- end content --></div>
-			<div class="fb-like" data-href="http://www.facebook.com/MaximeStephanovitchFotographia" data-send="false" data-layout="button_count" data-width="450" data-show-faces="true"></div>
+			<div class="fb-like" data-href="http://www.facebook.com/MaximeStephanovitchFotographia" data-send="false" data-layout="button_count" data-width="450" data-show-faces="false"></div>
 		<div style="clear:both;"></div>
 	<!-- end container --></div>
 	<footer></footer><!-- a verifier -->
-	<form id="logbox">
-		<button id="close">X</button>
+	<form id="logbox" class="remove">
 	  <fieldset>
 	    <legend>Administration</legend>
 			<input id="login" type="text" name="login" placeholder="Login"/>
 			<input id="password" type="password" name="password" placeholder="Password" />
 			<button id="connect">Login</button>
 		</fieldset>
+		<button id="close">X</button>
 	<!-- end logbox --></form>
 </body>
+<script src="js/api.js"></script>
 <script src="js/admin.js"></script>
 <script src="js/gallery.js"></script>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) return;
+  js = d.createElement(s); js.id = id;
+  js.src = "//connect.facebook.net/fr_FR/all.js#xfbml=1&appId=405747459487893";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
 </html>

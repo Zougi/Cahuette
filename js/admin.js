@@ -1,8 +1,21 @@
+/* MaxPhotographer - admin.js */
+
+function get_selected_images() {
+	var ez_div = document.querySelectorAll('.img');
+	var url, urlz = []; 
+	for (var i = 0; i < ez_div.length; i++) {
+		if (ez_div[i].hasChildNodes()) {
+			url = window.getComputedStyle(ez_div[i]).getPropertyValue('background-image');
+			url = 'gallery/' + url.replace(/^url\(["']?.*(\\|\/)/, '').replace(/["']?\)$/, '');
+			urlz.push(url);
+		}
+	}
+	return urlz;
+}
 
 //switch to admin display
 function admin_display() {
 	var e_bt,
-			e_logbox = document.getElementById('logbox'),
 			e_menu = document.getElementById('menu'),
 			e_content = document.getElementById('content'),
 			e_ul = e_menu.getElementsByTagName('ul')[0];
@@ -10,8 +23,7 @@ function admin_display() {
 	 		attr = document.createAttribute('class');
 
 	//remove logbox
-	attr.nodeValue = 'remove';
-	e_logbox.setAttributeNode(attr);
+	document.getElementById('logbox').className = 'remove';
 	
 	//add supress buttons
 	for (var i = 0; i < ez_li.length; i++) {
@@ -19,9 +31,16 @@ function admin_display() {
 		e_bt.appendChild(document.createTextNode('x'));
 		e_bt.addEventListener('click', function(event) {
 			var e_li = event.target.parentNode;
-			if (confirm('remove ' + e_li.getElementsByTagName('a')[0].innerHTML + ' ?')) {
-				e_ul.removeChild(e_li);
-				//call api
+			var section_name = e_li.getElementsByTagName('a')[0].innerHTML;
+			if (confirm('remove ' + section_name + ' ?')) {
+				var api = new API();
+				api.rm_section(section_name, function() {
+					if (section_name == section) {
+						window.location.reload(true);
+					} else {
+						e_ul.removeChild(e_li);
+					}
+				});
 			}
 		});
 		attr = document.createAttribute('title');
@@ -49,11 +68,14 @@ function admin_display() {
 		
 		e_bt = document.createElement('button');
 		e_bt.appendChild(document.createTextNode('x'));
-		e_bt.addEventListener('click', function(event) {
+		e_bt.addEventListener('click', function(event) {	
 			var e_li = event.target.parentNode;
-			if (confirm('remove ' + e_li.getElementsByTagName('a')[0].innerHTML + ' ?')) {
-				e_ul.removeChild(e_li);
-				//call api
+			var section_name = e_li.getElementsByTagName('a')[0].innerHTML;
+			if (confirm('remove ' + section_name + ' ?')) {
+				var api = new API();
+				api.rm_section(section_name, function() {
+					e_ul.removeChild(e_li);
+				});
 			}
 		});
 		
@@ -105,63 +127,72 @@ function admin_display() {
 	e_bt.setAttributeNode(attr);
 	e_bt.appendChild(document.createTextNode('remove'));
 	e_bt.addEventListener('click', function(event) {
-		var ez_div = document.querySelectorAll('.img');
-		var urlz = []; 
-		for (var i = 0; i < ez_div.length; i++) {
-			if (ez_div[i].hasChildNodes()) {
-				var url = window.getComputedStyle(ez_div[i]).getPropertyValue('background-image');
-				url = 'gallery/' + url.replace(/^url\(["']?.*(\\|\/)/, '').replace(/["']?\)$/, '');
-				urlz.push(url);
-			}
-		}
-		var formData = new FormData();
-
-		formData.append('token', localStorage.getItem('token'));
-		formData.append('section', section);
-		for (var i = 0; i < urlz.length; i++) {
-			formData.append('url' + i, urlz[i]);	
-		}
-		
-	  var xhr = new XMLHttpRequest();
-	  xhr.open('POST', 'api/gallery/remove.php', true);
-	  xhr.onreadystatechange = function() {
-			if (xhr.readyState == 4 /* complete */) {
-	      console.log(xhr.responseText);
-				window.location.reload();
-	    }
-		};
-	  xhr.send(formData);
+		var urlz = get_selected_images();
+		var api = new API();
+		api.rm_images(section, urlz, function() {
+			window.location.reload();
+		})
+	});
+	e_content.appendChild(e_bt);
+	
+	function text_convert(html)
+	{
+	   var tmp = document.createElement("div");
+	   tmp.innerHTML = html;
+	   return tmp.textContent||tmp.innerText;
+	}
+	
+	//move file up 
+	e_bt = document.createElement('button');
+	attr = document.createAttribute('class');
+	attr.nodeValue = 'bt_up';
+	e_bt.setAttributeNode(attr);
+	e_bt.appendChild(document.createTextNode(text_convert('&larr; up')));
+	e_bt.addEventListener('click', function(event) {
+		var url = get_selected_images()[0],
+				api = new API();
+		api.move_image(section, url, 'up', function() {
+		//	window.location.reload(true);
+		});
+	});
+	e_content.appendChild(e_bt);
+	
+	//move file down 
+	e_bt = document.createElement('button');
+	attr = document.createAttribute('class');
+	attr.nodeValue = 'bt_down';
+	e_bt.setAttributeNode(attr);
+	e_bt.appendChild(document.createTextNode(text_convert('down &rarr;')));
+	e_bt.addEventListener('click', function(event) {
+		var url = get_selected_images()[0],
+				api = new API();
+		api.move_image(section, url, 'down', function() {
+		//	window.location.reload(true);
+		});
 	});
 	e_content.appendChild(e_bt);
 }
 
 //button close logbox
 document.getElementById('close').addEventListener('click', function(event) {
-	var e_logbox = document.getElementById('logbox'),
-			attr = document.createAttribute('class');
-	attr.nodeValue = 'remove';
-	e_logbox.setAttributeNode(attr);
+	document.getElementById('logbox').className = 'remove';
 	event.preventDefault ? event.preventDefault() : event.returnValue = false;
-	window.history.pushState(null, document.title, '.');
+	window.history.pushState(null, document.title, '.#' + section);
 	return false;
 });
 
 //button connect logbox call api/login
-document.addEventListener('submit', function (event) {
+document.getElementById('logbox').addEventListener('submit', function (event) {
 	var login = document.getElementById('login').value,
 			password = document.getElementById('password').value;
 			
-	var xhr = new XMLHttpRequest();
-	xhr.open('GET', 'api/user/login.php?login=' + login + '&password=' + password, true);
-	xhr.onreadystatechange = function() {
-	  if (xhr.readyState == 4 /* complete */) {
-			var result = JSON.parse(xhr.responseText);
-			localStorage.setItem('token', result.token);
-			admin_display();
-			window.history.pushState(null, document.title, '.');		
-	  }
-	};
-	xhr.send();
+	var api = new API();
+	api.login(login, password, function(response) {
+		var result = JSON.parse(response);
+		localStorage.setItem('token', result.token);
+		admin_display();
+		window.history.pushState(null, document.title, '.');
+	});
 	event.preventDefault ? event.preventDefault() : event.returnValue = false;
 	return false;
 });
@@ -172,39 +203,8 @@ function init() {
 	if (token != undefined && token != null) {
 		admin_display();
 	} else if (location.search == '?login') { 		//display login form if #login in url
-		var e_logbox = document.getElementById('logbox'),
-				attr = document.createAttribute('class');
-		attr.nodeValue = 'add';
-		e_logbox.setAttributeNode(attr);
+		document.getElementById('logbox').className = 'add';
 	}
-}
-
-
-function send_img(section, files, callback) {
-  var formData = new FormData();
-
-	formData.append('token', localStorage.getItem('token'));
-	formData.append('section', section);
-	for (var file in files) {
-		formData.append('file' + file, files[file]);
-	}
-		
-  var xhr = new XMLHttpRequest();
-  xhr.open('POST', 'api/gallery/add.php', true);
-  xhr.onreadystatechange = function() {
-		if (xhr.readyState == 4 /* complete */) {
-      console.log(xhr.responseText);
-			//callback(xhr.responseText);
-    }
-	};
-	// var progressBar = document.querySelector('progress');
-	//   xhr.upload.onprogress = function(e) {
-	//     if (e.lengthComputable) {
-	//       progressBar.value = (e.loaded / e.total) * 100;
-	//       progressBar.textContent = progressBar.value; // Fallback for unsupported browsers.
-	//     }
-	//   };
-  xhr.send(formData);
 }
 
 function handleFileSelect(event) {
@@ -217,8 +217,9 @@ function handleFileSelect(event) {
 				return;
 			}
 		}
-		send_img(section || url_tag || Object.keys(gallery)[0], files, function(reponse) {
-			window.location.href = '#' + section;
+		var api = new API();
+		api.add_images(section || url_tag || Object.keys(gallery)[0], files, function(reponse) {
+			window.location.reload(true);
 		});
 	} catch(e) {
 		if (typeof debug != 'undefined' && debug) {
