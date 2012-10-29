@@ -1,5 +1,3 @@
-/* MaxPhotographer - contacts.js */
-
 function init() {
 	var pos_slash = location.href.lastIndexOf('/') + 1,
 			href = location.href.substr(0, pos_slash),

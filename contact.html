@@ -11,13 +11,6 @@
 </head>
 <body>
 	<div id="fb-root"></div>
-	<script>(function(d, s, id) {
-	  var js, fjs = d.getElementsByTagName(s)[0];
-	  if (d.getElementById(id)) return;
-	  js = d.createElement(s); js.id = id;
-	  js.src = "//connect.facebook.net/fr_FR/all.js#xfbml=1&appId=405747459487893";
-	  fjs.parentNode.insertBefore(js, fjs);
-	}(document, 'script', 'facebook-jssdk'));</script>
 	<div id="header">
 		<div id="logo" title="logo">Maxime Stephanovitch</div>
 		<div id="contact"><a href="contacts.html">Contact</a></div>
@@ -47,4 +40,13 @@
 </body>
 <script src="js/gallery.js"></script>
 <script src="js/contact.js"></script>
+<script>
+(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) return;
+  js = d.createElement(s); js.id = id;
+  js.src = "//connect.facebook.net/fr_FR/all.js#xfbml=1&appId=405747459487893";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));
+</script>
 </html>

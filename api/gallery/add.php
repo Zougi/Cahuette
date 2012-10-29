@@ -16,7 +16,7 @@ function add_to_gallery_json($section, $img_json) {
 	if ($gallery != null) {
 		foreach ($gallery as $key => $value) {
 			if ($section == $key && $inObj == false) {
-				array_push($gallery[$section], $img_json);
+				$gallery[$section] = array_merge($gallery[$section], $img_json);
 				$inObj = true;
 				break;
 			}

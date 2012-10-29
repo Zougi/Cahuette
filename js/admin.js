@@ -120,6 +120,27 @@ function admin_display() {
 	e_input_u.addEventListener('change', handleFileSelect, false);
 	e_content.appendChild(e_input_u);
 	
+	
+	var e_gallery = document.getElementById('gallery');
+	e_gallery.addEventListener('dragenter', function() {
+			if (event.target.className == 'img') {
+				 event.target.parentNode.style.opacity = 0.2;
+			} else {
+				 event.target.style.opacity = 0.2;
+			}
+      return false;
+  });
+
+	e_gallery.addEventListener('dragleave', function(event) {
+		event.target.parentNode.style.opacity = 1;
+    return false;
+	});
+	e_gallery.addEventListener('drop', function(event) {
+		event.target.parentNode.style.opacity = 1;
+		handleFileSelect(event);
+	});
+	
+	
 	//remove files
 	e_bt = document.createElement('button');
 	attr = document.createAttribute('class');
@@ -152,7 +173,7 @@ function admin_display() {
 		var url = get_selected_images()[0],
 				api = new API();
 		api.move_image(section, url, 'up', function() {
-		//	window.location.reload(true);
+			window.location.reload(true);
 		});
 	});
 	e_content.appendChild(e_bt);
@@ -167,7 +188,7 @@ function admin_display() {
 		var url = get_selected_images()[0],
 				api = new API();
 		api.move_image(section, url, 'down', function() {
-		//	window.location.reload(true);
+			window.location.reload(true);
 		});
 	});
 	e_content.appendChild(e_bt);
@@ -209,7 +230,7 @@ function init() {
 
 function handleFileSelect(event) {
 	try {
-		var files = (event.target.files || event.originalEvent.dataTransfer.files);
+		var files = (event.target.files || event.dataTransfer.files || event.originalEvent.dataTransfer.files);
 
 		for (var file in files) {
 			if (file.type != undefined && !file.type.match('image.*')) {
