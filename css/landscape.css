@@ -32,6 +32,12 @@ body {
 	font-family: 'king_regular';
 	padding: 0 23px;
 	cursor: default;
+	-webkit-touch-callout: none;
+	-webkit-user-select: none;
+	-moz-user-select: none;
+	-o-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
 }
 
 #header > #lang {
