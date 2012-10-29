@@ -102,6 +102,7 @@ function fill_menu(result) {
 function generate_gallery(gallery, name, max) {
 	var e_img,
 			i = 0;
+	e_load.className = 'add_inline';
 	for (var img in gallery[name]) {
 		if (i++ > max - 1) {
 			break;

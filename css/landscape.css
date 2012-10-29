@@ -292,7 +292,7 @@ body {
 	display: none;
 	white-space: normal;
 	width: 100px;
-	height: 430px;
+	height: 540px;
 	border: 1px solid #eeeeee;
 	margin: 0;
 }
@@ -301,7 +301,7 @@ body {
 	position: relative;
 	width: 100px;
 	height: 100px;
-	margin-top: 120px;
+	margin-top: 220px;
 
 	-webkit-border-radius: 100px;
 	-webkit-transform: scale(0.5);
