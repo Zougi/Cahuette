@@ -250,11 +250,14 @@ body {
 
 #logbox > fieldset >:last-child {
 	margin-top: 10px;
+	background: none;
+	color: #C9C9C9;
 }
 
 #logbox > button {
 	position: absolute;
 	top: 0;
+	color: #C9C9C9;
 	right: 0;
 	background: none;
 }

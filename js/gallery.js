@@ -35,14 +35,16 @@ function get_storage(text, success, error) {
 
 /* add an image to the gallery */
 function add_img_gallery(img) {
-	if (img == undefined) return;
-	var e_load = document.getElementById('load'),
-			e_img = document.createElement('div'),
-			e_img_attr = document.createAttribute('style');
-
+		var e_load = document.getElementById('load'),
+				e_img = document.createElement('div'),
+				e_img_attr = document.createAttribute('style');
+				
+	if (img == undefined || g_gallery == null) return;
+	
 	var n_img = new Image();
 	n_img.src = img.url;
 	n_img.onload = function() {
+		
 		e_img_attr.nodeValue = 'background-image: url(' + img.url + '); width: ' +  540 * (n_img.width / n_img.height) + 'px';
 		e_img.setAttributeNode(e_img_attr);
 
@@ -69,11 +71,9 @@ function add_img_gallery(img) {
 															+ ' ' + (nbr_imgz == 1 ? 'add_inline' : 'remove');
 				}
 			}
-		})
+		});
 	};
-	if (g_gallery != null) {
-	    g_gallery.insertBefore(e_img, e_load);
-	}
+	g_gallery.insertBefore(e_img, e_load);
 }
 
 /* fill the menu*/
@@ -107,7 +107,7 @@ function clear_gallery() {
 }
 
 /* add section to menu */
-function add_menu_section(name, e_menu, e_ul, e_li) {
+function add_menu_section(name, e_menu, e_ul) {
 	var e_li = document.createElement('li'),
 			e_a = document.createElement('a'),
 			e_a_attr = document.createAttribute('href');
@@ -136,13 +136,14 @@ function add_menu_section(name, e_menu, e_ul, e_li) {
 //trigger whenever gallery has been fully scrolled to the right
 var g_gallery = document.getElementById('gallery');
 if (g_gallery != null) {
+	var e_load = document.getElementById('load');
 	g_gallery.addEventListener('scroll', function() {
 		if (g_gallery.scrollWidth - g_gallery.offsetWidth <= g_gallery.scrollLeft)
 		{
 			var nb_all_imgs = g_gallery.getElementsByClassName('img').length,
 					nb_gallery = gallery[section].length;
 		 	if (nb_gallery > nb_all_imgs) {
-				document.getElementById('load').className = 'add_inline';
+				e_load.className = 'add_inline';
 
 				var i = 0;
 				while (nb_gallery > nb_all_imgs + i || i == 2) {
@@ -150,7 +151,7 @@ if (g_gallery != null) {
 				}
 			}
 			if (nb_gallery == nb_all_imgs) {
-				document.getElementById('load').className = 'remove';
+				e_load.className = 'remove';
 			}
 		}
 	});
@@ -187,23 +188,27 @@ var dragged, offsetX,
  		g_gallery = document.getElementById('gallery');
 if (g_gallery != null) {
 	g_gallery.onmousedown = function(event) {
+		dragged = false;
 	    if (event.button == 2) return;
-	    dragged = true;
+			if (event.screenY < g_gallery.parentNode.offsetHeight - 5) { //correct bug no mouseup trigger after use of scrollbar
+				dragged = true;
+			}
 	    offsetX = event.screenX - this.offsetLeft;
 	    return false;
 	}
 
-	document.onmousemove = function(event) {
+	g_gallery.onmousemove = function(event) {
 		if (dragged) {
-			g_gallery.scrollLeft = g_gallery.scrollLeft - (event.screenX - offsetX) / 7; //the division slows the slide
+			g_gallery.scrollLeft = g_gallery.scrollLeft - (event.screenX - offsetX) / 7; //the division slows the slide by cursor
 		}
 	} 
      
-	document.onmouseup = function() {
+	g_gallery.onmouseup = function() {
 	  if (dragged) {
 			dragged = false;
 	  }
 	}
+	
 }
 
 // //loader
