@@ -74,14 +74,14 @@ function create_img_gallery(img) {
 			}
 		});
 		g_count++;
-		if (g_count == max_gallery || gallery[section].length - g_count < 3) {
+		if (g_count % max_gallery == 0 || gallery[section].length - g_count < max_gallery) {
 			tmp_imgz = tmp_imgz.reverse();
 			var elem,
 					e_load = document.getElementById('load');
 			while (elem = tmp_imgz.pop()) {
 				g_gallery.insertBefore(elem, e_load);	
 			}
-			g_count = 0;
+			tmp_imgz = [];
 			e_load.className = 'remove';
 		}
 	};
@@ -161,7 +161,7 @@ if (g_gallery != null) {
 				e_load.className = 'add_inline';
 
 				var e_img, i = 0;
-				while (nb_gallery > nb_all_imgs + i || i == 2) {
+				while (nb_gallery > nb_all_imgs + i && i < max_gallery) {
 					e_img = create_img_gallery(gallery[section][nb_all_imgs + i++]);
 					tmp_imgz.push(e_img);
 				}

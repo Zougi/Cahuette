@@ -171,9 +171,9 @@ body {
 	overflow-y: hidden;
 	overflow-x: scroll;
 	width: auto;
-	height: 550px;
 	margin-top: 23px;
 	white-space: nowrap;
+	min-height: 550px;
 }
 
 #content > #gallery > .img {
@@ -183,7 +183,7 @@ body {
 	background: no-repeat center;
 	height: 540px;
 	background-size: auto 540px;
-	margin: -12px 7px 10px 0 !important;
+	margin: 0 7px 7px 0 !important;
 }
 
 #content > #gallery >:first-child {
