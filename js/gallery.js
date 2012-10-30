@@ -35,6 +35,8 @@ function get_storage(text, success, error) {
 
 var mql = window.matchMedia("only screen and (max-width:480px)");
 mql.addListener(function(m) {
+	var e_load = document.getElementById('load');
+	e_load.className = m.matches ? 'add' : 'add_inline';
 	var n_img, url, style,
 			ez_div = document.querySelectorAll('.img');
 	for (var i in ez_div) {
@@ -42,6 +44,7 @@ mql.addListener(function(m) {
 			url = 'gallery/' + url.replace(/^url\(["']?.*(\\|\/)/, '').replace(/["']?\)$/, '');
 			n_img = new Image();
 			n_img.src = url;
+			n_img.lastSrc = ez_div[ez_div.length - 1];
 			n_img.onload = function(event, t) {
 				var url, src = event.target.getAttribute('src'),
 						ez_div = document.querySelectorAll('.img');
@@ -55,6 +58,9 @@ mql.addListener(function(m) {
 							ez_div[i].setAttribute('style', 'background-image: url(' + url + '); width: ' + 540 * (n_img.width / n_img.height) + 'px;');
 						}
 					}
+				}
+				if (ez_div[i] == n_img.lastSrc) {
+					e_load.className = 'remove';
 				}
 			};
 	}
@@ -266,21 +272,5 @@ if (g_gallery != null) {
 			dragged = false;
 	  }
 	}
-	
-	//loader
-	var count = 0;
-			window.setInterval(function() {
-			  var e_div = document.getElementById('loader'),
-						e_div_rotate = 'scale(0.5) rotate(' + count + 'deg)';
-				e_div.style.MozTransform = e_div_rotate;
-				e_div.style.WebkitTransform = e_div_rotate;
-				e_div.style.OTransform = e_div_rotate;
-				e_div.style.MsTransform = e_div_rotate;
-				e_div.style.transform = e_div_rotate;
-			  if (count == 360) {
-					count = 0
-				}
-			  count += 45;
-			}, 70);
 
 }
