@@ -40,32 +40,6 @@ body {
 	user-select: none;
 }
 
-#header > #lang {
-	position: absolute;
-	right: 20px;
-	padding: 8px 10px;
-	cursor: pointer;
-	border-bottom: 1px solid #000;
-}
-
-#header > #lang:hover {
-	background-color: #eeeeee;
-}
-
-#header > #lang > span {
-
-}
-
-#header > #lang > ul {
-	margin: 0;
-	padding: 0;
-	list-style: none;
-}
-
-#header > #lang > ul > li {
-	display: none;
-	cursor: pointer;
-}
 
 #header > #admin {
 	position: absolute;

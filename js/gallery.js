@@ -33,6 +33,33 @@ function get_storage(text, success, error) {
 	xhr.send();
 }
 
+var mql = window.matchMedia("only screen and (max-width:480px)");
+mql.addListener(function(m) {
+	var n_img, url, style,
+			ez_div = document.querySelectorAll('.img');
+	for (var i in ez_div) {
+			url = window.getComputedStyle(ez_div[i]).getPropertyValue('background-image');
+			url = 'gallery/' + url.replace(/^url\(["']?.*(\\|\/)/, '').replace(/["']?\)$/, '');
+			n_img = new Image();
+			n_img.src = url;
+			n_img.onload = function(event, t) {
+				var url, src = event.target.getAttribute('src'),
+						ez_div = document.querySelectorAll('.img');
+				for (var i = 0; i < ez_div.length; i++) {
+					url = window.getComputedStyle(ez_div[i]).getPropertyValue('background-image');
+					url = 'gallery/' + url.replace(/^url\(["']?.*(\\|\/)/, '').replace(/["']?\)$/, '');
+					if (url == src) {
+						if (m.matches) {
+							ez_div[i].setAttribute('style', 'background-image: url(' + url + '); height: ' + (n_img.height / n_img.width) * 380 + 'px;');
+						} else {
+							ez_div[i].setAttribute('style', 'background-image: url(' + url + '); width: ' + 540 * (n_img.width / n_img.height) + 'px;');
+						}
+					}
+				}
+			};
+	}
+});
+
 var g_count = 0;
 /* add an image to the gallery */
 function create_img_gallery(img) {
@@ -46,7 +73,10 @@ function create_img_gallery(img) {
 	n_img.src = img.url;
 	n_img.onload = function() {
 		
-		e_img_attr.nodeValue = 'background-image: url(' + img.url + '); width: ' +  540 * (n_img.width / n_img.height) + 'px';
+		e_img_attr.nodeValue = 'background-image: url(' + img.url + '); ' + (
+		 												window.matchMedia("only screen and (max-width:480px)").matches
+														? 'height: ' + (n_img.height / n_img.width) * 380 + 'px;'
+														: 'width: ' +  540 * (n_img.width / n_img.height) + 'px;');
 		e_img.setAttributeNode(e_img_attr);
 
 		e_img_attr = document.createAttribute('class');
@@ -102,7 +132,7 @@ function fill_menu(result) {
 function generate_gallery(gallery, name, max) {
 	var e_img,
 			i = 0;
-	e_load.className = 'add_inline';
+	e_load.className = mql.matches ? 'add' : 'add_inline';
 	for (var img in gallery[name]) {
 		if (i++ > max - 1) {
 			break;
@@ -156,20 +186,32 @@ if (g_gallery != null) {
 	g_gallery.addEventListener('scroll', function() {
 		if (g_gallery.scrollWidth - g_gallery.offsetWidth <= g_gallery.scrollLeft)
 		{
-			var nb_all_imgs = g_gallery.getElementsByClassName('img').length,
-					nb_gallery = gallery[section].length;
-		 	if (nb_gallery > nb_all_imgs) {
-				e_load.className = 'add_inline';
-
-				var e_img, i = 0;
-				while (nb_gallery > nb_all_imgs + i && i < max_gallery) {
-					e_img = create_img_gallery(gallery[section][nb_all_imgs + i++]);
-					tmp_imgz.push(e_img);
-				}
-			}
+			add_img_gallery();
 		}
 	});
 }
+
+function add_img_gallery() {
+	var nb_all_imgs = g_gallery.getElementsByClassName('img').length,
+			nb_gallery = gallery[section].length;
+ 	if (nb_gallery > nb_all_imgs) {
+		e_load.className = mql.matches ? 'add' : 'add_inline';
+
+		var e_img, i = 0;
+		while (nb_gallery > nb_all_imgs + i && i < max_gallery) {
+			e_img = create_img_gallery(gallery[section][nb_all_imgs + i++]);
+			tmp_imgz.push(e_img);
+		}
+	}
+}
+
+window.addEventListener('scroll', function(event) {
+		if (mql.matches) {
+			if (window.pageYOffset == document.documentElement.scrollHeight - document.documentElement.clientHeight) {
+				add_img_gallery();
+			}
+		}
+});
 
 //get arg in url after #
 function get_UrlArg() {
@@ -227,18 +269,18 @@ if (g_gallery != null) {
 	
 	//loader
 	var count = 0;
-	window.setInterval(function() {
-	  var e_div = document.getElementById('loader'),
-				e_div_rotate = 'scale(0.5) rotate(' + count + 'deg)';
-		e_div.style.MozTransform = e_div_rotate;
-		e_div.style.WebkitTransform = e_div_rotate;
-		e_div.style.OTransform = e_div_rotate;
-		e_div.style.MsTransform = e_div_rotate;
-		e_div.style.transform = e_div_rotate;
-	  if (count == 360) {
-			count = 0
-		}
-	  count += 45;
-	}, 70);
+			window.setInterval(function() {
+			  var e_div = document.getElementById('loader'),
+						e_div_rotate = 'scale(0.5) rotate(' + count + 'deg)';
+				e_div.style.MozTransform = e_div_rotate;
+				e_div.style.WebkitTransform = e_div_rotate;
+				e_div.style.OTransform = e_div_rotate;
+				e_div.style.MsTransform = e_div_rotate;
+				e_div.style.transform = e_div_rotate;
+			  if (count == 360) {
+					count = 0
+				}
+			  count += 45;
+			}, 70);
 
 }
