@@ -17,7 +17,7 @@ body {
 	position: relative;
 	overflow: hidden;
 	min-width: 900px;
-	height: 90px;
+	height: 42px;
 	margin-bottom: 7px;
 }
 
@@ -26,8 +26,7 @@ body {
 }
 
 #header > #logo {
-	height: 70px;
-	font-size: 42pt;
+	font-size: 14pt;
 	text-shadow: 2px 2px 4px #999;
 	font-family: 'king_regular';
 	padding: 0 23px;
@@ -40,22 +39,10 @@ body {
 	user-select: none;
 }
 
-
-#header > #admin {
+#header > .fb-like {
+	right: 32px;
+	top: 4px;
 	position: absolute;
-	right: 70px;
-	padding: 8px 10px;
-	cursor: pointer;
-	border-bottom: 1px solid #000;
-}
-
-#header > #admin:hover {
-	background-color: #eeeeee;
-}
-
-#header > #admin > a {
-	color: #000;
-	text-decoration: none;
 }
 
 #container {
@@ -164,6 +151,7 @@ body {
 	height: 540px;
 	background-size: auto 540px;
 	margin: 0 7px 7px 0 !important;
+	position: relative;
 }
 
 #content > #gallery >:first-child {
@@ -172,9 +160,10 @@ body {
 
 #content > #gallery > .img > span {
 	border: 5px dashed black;
-	height: 95%;
-	margin-top: 12px;
-	position: relative;
+	position: absolute;
+	top: 0;
+	height: 98%;
+	width: 98.7%;
 	display: block;
 }
 

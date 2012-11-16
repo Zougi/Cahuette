@@ -35,7 +35,7 @@ API.format_get_data = function(args) {
 API.format_post_data = function(args) {
 	var formData = new FormData();
 	for (var a in args) {
-		if (typeof args[a] == "object") {
+		if (typeof args[a] == "object") { //if files...
 			for (var i = 0; i < args[a].length; i++) {
 				formData.append(a + i, args[a][i]);
 			}

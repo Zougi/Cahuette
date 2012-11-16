@@ -284,7 +284,7 @@ body {
 #content > #gallery > #load > div {
 	position: relative;
 	width: auto;
-	height: auto;
+	height: 40px;
 	margin-top: 4px;
 	background: url('loader.gif') center no-repeat;
 }

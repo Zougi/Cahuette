@@ -1,6 +1,8 @@
 /* MaxPhotographer - gallery.js */
 
-var max_gallery = 3;
+var max_gallery = 2,
+		landscape_max_height = 540,
+		landscape_max_width = 380;
 var gallery, section;
 
 /* get obj gallery from json */
@@ -33,6 +35,12 @@ function get_storage(text, success, error) {
 	xhr.send();
 }
 
+function get_basename(elem) {
+	var url = window.getComputedStyle(elem.getPropertyValue('background-image'));
+	url = url.replace(/^url\(["']?.*(\\|\/)/, '').replace(/["']?\)$/, '');
+	return 'gallery/' + url;
+}
+
 var mql = window.matchMedia("only screen and (max-width:480px)");
 mql.addListener(function(m) {
 	var e_load = document.getElementById('load');
@@ -40,50 +48,61 @@ mql.addListener(function(m) {
 	var n_img, url, style,
 			ez_div = document.querySelectorAll('.img');
 	for (var i in ez_div) {
-			url = window.getComputedStyle(ez_div[i]).getPropertyValue('background-image');
-			url = 'gallery/' + url.replace(/^url\(["']?.*(\\|\/)/, '').replace(/["']?\)$/, '');
 			n_img = new Image();
-			n_img.src = url;
-			n_img.lastSrc = ez_div[ez_div.length - 1];
-			n_img.onload = function(event, t) {
+			n_img.src = get_basename(ez_div[i]);
+			n_img.onload = function(event) {
 				var url, src = event.target.getAttribute('src'),
-						ez_div = document.querySelectorAll('.img');
+						ez_div = document.querySelectorAll('.img'),
+						height = landscape_max_width * (event.target.height / event.target.width),
+						width = landscape_max_height * (event.target.width / event.target.height);
+				height = 'height: ' + Math.round(height) + 'px;';
+				width = 'width: ' + Math.round(width) + 'px;';
 				for (var i = 0; i < ez_div.length; i++) {
-					url = window.getComputedStyle(ez_div[i]).getPropertyValue('background-image');
-					url = 'gallery/' + url.replace(/^url\(["']?.*(\\|\/)/, '').replace(/["']?\)$/, '');
+					url = get_basename(ez_div[i]);
 					if (url == src) {
-						if (m.matches) {
-							ez_div[i].setAttribute('style', 'background-image: url(' + url + '); height: ' + (n_img.height / n_img.width) * 380 + 'px;');
-						} else {
-							ez_div[i].setAttribute('style', 'background-image: url(' + url + '); width: ' + 540 * (n_img.width / n_img.height) + 'px;');
-						}
+						ez_div[i].setAttribute('style', 'background-image: url(' + url + '); '
+																		+ ((m.matches) ? height : width)); 
 					}
 				}
-				if (ez_div[i] == n_img.lastSrc) {
+				if (ez_div[i] == ez_div[ez_div.length - 1]) {
 					e_load.className = 'remove';
 				}
 			};
 	}
 });
 
+function img_resize(img, height, width) {
+	var e_canvas = document.createElement('canvas');
+	if (height != null) {
+		e_canvas.width = Math.round(height * (img.width / img.height));
+	  e_canvas.height = height;
+	} else {
+		e_canvas.height = Math.round(width * (img.height / img.width));
+		e_canvas.width = width;
+	}
+  var ctx = e_canvas.getContext('2d');
+  ctx.drawImage(img, 0, 0, e_canvas.width, e_canvas.height);
+  return e_canvas;
+}
+
 var g_count = 0;
 /* add an image to the gallery */
 function create_img_gallery(img) {
-	var e_load = document.getElementById('load'),
-			e_img = document.createElement('div'),
+	var e_img = document.createElement('div'),
+			e_load = document.getElementById('load'),
 			e_img_attr = document.createAttribute('style');
 				
 	if (img == undefined || g_gallery == null) return;
 	
 	var n_img = new Image();
 	n_img.src = img.url;
-	n_img.onload = function() {
-		
-		e_img_attr.nodeValue = 'background-image: url(' + img.url + '); ' + (
-		 												window.matchMedia("only screen and (max-width:480px)").matches
-														? 'height: ' + (n_img.height / n_img.width) * 380 + 'px;'
-														: 'width: ' +  540 * (n_img.width / n_img.height) + 'px;');
-		e_img.setAttributeNode(e_img_attr);
+	n_img.onload = function(event) {
+			
+			if (window.matchMedia("only screen and (max-width:480px)").matches) {
+				e_img.appendChild(img_resize(event.target, null, landscape_max_width));
+			} else {
+				e_img.appendChild(img_resize(event.target, landscape_max_height));
+			}
 
 		e_img_attr = document.createAttribute('class');
 		e_img_attr.nodeValue = 'img';
@@ -91,13 +110,13 @@ function create_img_gallery(img) {
 	
 		var btz = null;
 		e_img.addEventListener('click', function(event) {
-			var elem = event.target,
+			var elem = event.target.parentNode,
 					token = localStorage.getItem('token');
 			if (token != undefined && token != null) {
-				if (elem.nodeName.toLowerCase() != 'span') {
+				if (elem.childNodes.length == 1) {
 					elem.appendChild(document.createElement('span'));
 				} else {
-					elem.parentNode.removeChild(elem);
+					elem.removeChild(elem.lastChild);
 				}
 				if (btz == null) {
 					btz = document.querySelectorAll('.bt_up, .bt_down');
