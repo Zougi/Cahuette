@@ -32,7 +32,7 @@
 		<!-- end content --></div>
 		<div style="clear:both;"></div>
 	<!-- end container --></div>
-	<footer><a href="mailto:maxime.stephanovitch[at]gmail.com">maxime.stephanovitch[at]gmail.com</a></footer><!-- a verifier -->
+	<footer><a id="email" href="mailto:maxime.stephanovitch[at]gmail.com"></a></footer><!-- a verifier -->
 	<form id="logbox" class="remove">
 	  <fieldset>
 	    <legend>Administration</legend>
@@ -47,6 +47,16 @@
 <script src="js/admin.js"></script>
 <script src="js/gallery.js"></script>
 <script>
+//email formater
+(function(d, id) {
+  var e = d.getElementById(id),
+			txt = e.getAttribute('href');
+	txt = txt.replace(/\[at\]/, '@');
+	e.setAttribute('href', txt);	
+	e.innerHTML = txt.substring('mailto:'.length, txt.length);
+})(document, 'email');
+
+//fb button
 (function(d, s, id) {
   var js, fjs = d.getElementsByTagName(s)[0];
   if (d.getElementById(id)) return;

@@ -4,9 +4,9 @@ function get_selected_images() {
 	var ez_div = document.querySelectorAll('.img');
 	var url, urlz = []; 
 	for (var i = 0; i < ez_div.length; i++) {
-		if (ez_div[i].hasChildNodes()) {
-			url = window.getComputedStyle(ez_div[i]).getPropertyValue('background-image');
-			url = 'gallery/' + url.replace(/^url\(["']?.*(\\|\/)/, '').replace(/["']?\)$/, '');
+		if (ez_div[i].childNodes.length > 1) {
+			url = ez_div[i].getAttribute('data-img');
+			url = 'gallery/' + url;
 			urlz.push(url);
 		}
 	}
@@ -25,7 +25,7 @@ function admin_display() {
 	//remove logbox
 	document.getElementById('logbox').className = 'remove';
 	
-	//add supress buttons
+	//add suppress buttons
 	for (var i = 0; i < ez_li.length; i++) {
 		e_bt = document.createElement('button');
 		e_bt.appendChild(document.createTextNode('x'));
@@ -187,7 +187,8 @@ function admin_display() {
 	e_bt.addEventListener('click', function(event) {
 		var url = get_selected_images()[0],
 				api = new API();
-		api.move_image(section, url, 'down', function() {
+		api.move_image(section, url, 'down', function(e) {
+			console.log(e);
 			window.location.reload(true);
 		});
 	});
@@ -210,9 +211,17 @@ document.getElementById('logbox').addEventListener('submit', function (event) {
 	var api = new API();
 	api.login(login, password, function(response) {
 		var result = JSON.parse(response);
-		localStorage.setItem('token', result.token);
-		admin_display();
-		window.history.pushState(null, document.title, '.');
+		if (result.error != undefined) {
+			if (result.error == 401) {
+				alert('error: login/password incorrect');
+			} else {
+				alert('error: problem api');
+			}
+		} else {
+			localStorage.setItem('token', result.token);
+			admin_display();
+			window.history.pushState(null, document.title, '.');
+		}
 	});
 	event.preventDefault ? event.preventDefault() : event.returnValue = false;
 	return false;

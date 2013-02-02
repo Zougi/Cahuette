@@ -162,9 +162,10 @@ body {
 	border: 5px dashed black;
 	position: absolute;
 	top: 0;
-	height: 98%;
-	width: 98.7%;
 	display: block;
+	left: 0;
+	bottom: 0;
+	right: 0;
 }
 
 #content > #gallery_bar {
@@ -284,4 +285,11 @@ body {
 	color: #000;
 	text-decoration: none;
 	font-size: 21pt;
+}
+
+footer > a {
+	display: block;
+	margin-top: 20px;
+	color: #000;
+	text-decoration: none;
 }

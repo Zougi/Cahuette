@@ -81,7 +81,7 @@ function img_resize(img, height, width) {
 		e_canvas.width = width;
 	}
   var ctx = e_canvas.getContext('2d');
-  ctx.drawImage(img, 0, 0, e_canvas.width, e_canvas.height);
+  ctx.drawImage(img,0, 0, img.width, img.height, 0, 0, e_canvas.width, e_canvas.height);
   return e_canvas;
 }
 
@@ -97,13 +97,19 @@ function create_img_gallery(img) {
 	var n_img = new Image();
 	n_img.src = img.url;
 	n_img.onload = function(event) {
-			
-			if (window.matchMedia("only screen and (max-width:480px)").matches) {
-				e_img.appendChild(img_resize(event.target, null, landscape_max_width));
-			} else {
-				e_img.appendChild(img_resize(event.target, landscape_max_height));
-			}
+		
+		var resized_img = (
+			window.matchMedia("only screen and (max-width:480px)").matches
+			? img_resize(event.target, null, landscape_max_width)
+			: img_resize(event.target, landscape_max_height)
+		);
+		e_img.appendChild(resized_img);
+				
+		var e_img_attr = document.createAttribute('data-img');
+		e_img_attr.nodeValue = this.src.substr(this.src.lastIndexOf('/') + 1);
+		e_img.setAttributeNode(e_img_attr);
 
+			
 		e_img_attr = document.createAttribute('class');
 		e_img_attr.nodeValue = 'img';
 		e_img.setAttributeNode(e_img_attr);

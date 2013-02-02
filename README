@@ -1,0 +1,40 @@
+Maxphotographer
+
+Lightway html5 gallery cms designed for photographers.
+It is easily editable with a simple admin interface.
+You can make your own sections, add/remove multiple images, change the images order of the gallery.
+The gallery also has a "smartphone view", try to resize the page or just display it from a smartphone
+
+The gallery is easily portable to any platform/app for example with apache cordova.
+By its design the gallery's images cannot be saved by right click. They either won't appear if you print the website.
+
+
+INSTALLATION
+
+The gallery doesn't require any database.
+
+1. If you don't have php on your server, read on, the gallery can work by its own. Else go to "2.".
+To add/edit images manually edit the file gallery.json. Root objects are the sections. The contain an array of objects containing name and url of the image. You can delete the api folder as it is not needed.
+
+2. If you have php. Make sure storage/gallery.json is writable.
+Edit $def_login and $def_password in api/user/login.php and logon with your new identifiers to http://your_website/?login 
+
+
+HOW TO ADMINISTRATE
+
+first log in to http://your_website/?login
+ 
+- add section: fill the input "new category" and add images to this category (see section below)
+
+- add image(s): You can drag n drop your images from your computer to the gallery. If you prefer a more conventional way, choose the button upload at the bottom of the gallery. (On chrome it's called "Choose files...", on firefox "Browse...").
+Note: The images will be uploaded to the section you are viewing
+
+- remove image(s): select (with left click) one or more images. Click on the remove button
+
+- move image: select just one image, click on the button up or down to move it
+
+- remove section: Just click on the cross near the section name in the menu. Validate with ok when you are asked.
+
+KNOWN BUGS / TIPS
+
+The gallery by default load 2 images by 2. If you want/need to load more, edit the first variable of the file js/gallery.js
