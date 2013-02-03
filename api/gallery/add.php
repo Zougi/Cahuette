@@ -37,7 +37,6 @@ function add_to_gallery_json($section, $img_json) {
 function save_files_to_disk($files) {
 	$gallery_path = '../../gallery/';
 	$gallery_virtual_path = 'gallery/';
-	$img_json = [];
 	foreach ($files as $key => $value) {
 		$filename = uniqid() . '.' . pathinfo($value['name'], PATHINFO_EXTENSION);
 		move_uploaded_file($value['tmp_name'], $gallery_path . $filename);

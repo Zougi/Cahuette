@@ -188,7 +188,6 @@ function admin_display() {
 		var url = get_selected_images()[0],
 				api = new API();
 		api.move_image(section, url, 'down', function(e) {
-			console.log(e);
 			window.location.reload(true);
 		});
 	});
@@ -252,10 +251,7 @@ function handleFileSelect(event) {
 			window.location.reload(true);
 		});
 	} catch(e) {
-		if (typeof debug != 'undefined' && debug) {
-			console.log('Display error');
-			console.log(e);
-		}
+		console.log(e);
 	}
 	event.preventDefault ? event.preventDefault() : event.returnValue = false;
 	return false;

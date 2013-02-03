@@ -202,7 +202,6 @@ function add_menu_section(name, e_menu, e_ul) {
 		
 		section = name;
 		localStorage.setItem('section', section);
-		//console.log(gallery[name]);
 	});
 	e_li.appendChild(e_a);
 	
