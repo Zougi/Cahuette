@@ -1,9 +1,8 @@
 /* MaxPhotographer - gallery.js */
 
-var max_gallery = 2,
-		landscape_max_height = 540,
+var landscape_max_height = 540,
 		landscape_max_width = 380;
-var gallery, section;
+var gallery, section, total_width;
 
 /* get obj gallery from json */
 function get_gallery(success) {
@@ -35,42 +34,25 @@ function get_storage(text, success, error) {
 	xhr.send();
 }
 
-function get_basename(elem) {
-	var url = window.getComputedStyle(elem.getPropertyValue('background-image'));
-	url = url.replace(/^url\(["']?.*(\\|\/)/, '').replace(/["']?\)$/, '');
-	return 'gallery/' + url;
-}
-
+/* regenerate gallery if view landscape/portrait change */
 var mql = window.matchMedia("only screen and (max-width:480px)");
 mql.addListener(function(m) {
-	var e_load = document.getElementById('load');
-	e_load.className = m.matches ? 'add' : 'add_inline';
-	var n_img, url, style,
-			ez_div = document.querySelectorAll('.img');
-	for (var i in ez_div) {
-			n_img = new Image();
-			n_img.src = get_basename(ez_div[i]);
-			n_img.onload = function(event) {
-				var url, src = event.target.getAttribute('src'),
-						ez_div = document.querySelectorAll('.img'),
-						height = landscape_max_width * (event.target.height / event.target.width),
-						width = landscape_max_height * (event.target.width / event.target.height);
-				height = 'height: ' + Math.round(height) + 'px;';
-				width = 'width: ' + Math.round(width) + 'px;';
-				for (var i = 0; i < ez_div.length; i++) {
-					url = get_basename(ez_div[i]);
-					if (url == src) {
-						ez_div[i].setAttribute('style', 'background-image: url(' + url + '); '
-																		+ ((m.matches) ? height : width)); 
-					}
-				}
-				if (ez_div[i] == ez_div[ez_div.length - 1]) {
-					e_load.className = 'remove';
-				}
-			};
-	}
+	setTimeout(function() {
+		generate_gallery(gallery[section]);
+	},100);
 });
 
+/* handle window resize */
+var flag = true;
+window.onresize = function(e) {
+	var e_gallery = document.getElementById('gallery');
+	if (e_gallery.offsetWidth > total_width && flag === true && !mql.matches) {
+		add_img_gallery();
+		flag = false;
+	}
+}
+
+/* resize image using canvas */
 function img_resize(img, height, width) {
 	var e_canvas = document.createElement('canvas');
 	if (height != null) {
@@ -85,35 +67,46 @@ function img_resize(img, height, width) {
   return e_canvas;
 }
 
-var g_count = 0;
-/* add an image to the gallery */
-function create_img_gallery(img) {
+/* add images to the gallery */
+function generate_gallery(imgz, iterator) {
 	var e_img = document.createElement('div'),
 			e_load = document.getElementById('load'),
-			e_img_attr = document.createAttribute('style');
+			e_img_attr = document.createAttribute('style'),
+			e_gallery = document.getElementById('gallery');
 				
-	if (img == undefined || g_gallery == null) return;
+	if (imgz == undefined || g_gallery == null) return;
+	if (iterator == undefined) {
+		iterator = 0;
+		total_width = 0;
+		clear_gallery();
+	}
 	
-	var n_img = new Image();
+	//display loader
+	e_load.className = mql.matches ? 'add' : 'add_inline';
+	
+	var img =  imgz[iterator],
+			n_img = new Image();
 	n_img.src = img.url;
 	n_img.onload = function(event) {
 		
+		//resize image to canva
 		var resized_img = (
 			window.matchMedia("only screen and (max-width:480px)").matches
 			? img_resize(event.target, null, landscape_max_width)
 			: img_resize(event.target, landscape_max_height)
 		);
 		e_img.appendChild(resized_img);
-				
-		var e_img_attr = document.createAttribute('data-img');
+		
+		//add infos to image
+		var e_img_attr = document.createAttribute('data-src');
 		e_img_attr.nodeValue = this.src.substr(this.src.lastIndexOf('/') + 1);
 		e_img.setAttributeNode(e_img_attr);
-
 			
 		e_img_attr = document.createAttribute('class');
 		e_img_attr.nodeValue = 'img';
 		e_img.setAttributeNode(e_img_attr);
 	
+		//image can be selected to be manipulated if user is admin
 		var btz = null;
 		e_img.addEventListener('click', function(event) {
 			var elem = event.target.parentNode,
@@ -134,19 +127,19 @@ function create_img_gallery(img) {
 				}
 			}
 		});
-		g_count++;
-		if (g_count % max_gallery == 0 || gallery[section].length - g_count < max_gallery) {
-			tmp_imgz = tmp_imgz.reverse();
-			var elem,
-					e_load = document.getElementById('load');
-			while (elem = tmp_imgz.pop()) {
-				g_gallery.insertBefore(elem, e_load);	
-			}
-			tmp_imgz = [];
-			e_load.className = 'remove';
+		
+		//insert the image at last position
+		g_gallery.insertBefore(e_img, e_load);
+		
+		//add another image if there is space to fill on the block
+		total_width += mql.matches ? resized_img.height : resized_img.width;
+		e_gallery_width = mql.matches ? e_gallery.offsetHeight : e_gallery.offsetWidth;
+		if (!(total_width > e_gallery_width || imgz.length == iterator + 1)) {
+			generate_gallery(imgz, ++iterator);	
 		}
+		//hide loader
+		e_load.className = 'remove';
 	};
-	return e_img;
 }
 
 /* fill the menu*/
@@ -159,20 +152,7 @@ function fill_menu(result) {
 	}
 }
 
-/* add images to gallery */
-function generate_gallery(gallery, name, max) {
-	var e_img,
-			i = 0;
-	e_load.className = mql.matches ? 'add' : 'add_inline';
-	for (var img in gallery[name]) {
-		if (i++ > max - 1) {
-			break;
-		}
-		e_img = create_img_gallery(gallery[name][img]);
-		g_gallery.insertBefore(e_img, e_load);
-	}
-}
-
+/* clear all images from gallery */
 function clear_gallery() {
 	var all_imgs = g_gallery.getElementsByClassName('img');
 	if (all_imgs.length > 0) {
@@ -185,20 +165,17 @@ function clear_gallery() {
 /* add section to menu */
 function add_menu_section(name, e_menu, e_ul) {
 	var e_li = document.createElement('li'),
-			e_a = document.createElement('a'),
-			e_a_attr = document.createAttribute('href');
+			e_a = document.createElement('a');
 	
 	e_a.innerHTML = name;
 
+	var e_a_attr = document.createAttribute('href');
 	e_a_attr.nodeValue = '#' + name;
 	e_a.setAttributeNode(e_a_attr);
 	
 	e_a.addEventListener('click', function() {
-		//remove previous images in gallery
-		clear_gallery();
-		
 		//add section's imgages to gallery
-		generate_gallery(gallery, name, max_gallery);
+		generate_gallery(gallery[name]);
 		
 		section = name;
 		localStorage.setItem('section', section);
@@ -211,7 +188,6 @@ function add_menu_section(name, e_menu, e_ul) {
 //trigger whenever gallery has been fully scrolled to the right
 var g_gallery = document.getElementById('gallery');
 if (g_gallery != null) {
-	var tmp_imgz = [];
 	var e_load = document.getElementById('load');
 	g_gallery.addEventListener('scroll', function() {
 		if (g_gallery.scrollWidth - g_gallery.offsetWidth <= g_gallery.scrollLeft)
@@ -225,22 +201,16 @@ function add_img_gallery() {
 	var nb_all_imgs = g_gallery.getElementsByClassName('img').length,
 			nb_gallery = gallery[section].length;
  	if (nb_gallery > nb_all_imgs) {
-		e_load.className = mql.matches ? 'add' : 'add_inline';
-
-		var e_img, i = 0;
-		while (nb_gallery > nb_all_imgs + i && i < max_gallery) {
-			e_img = create_img_gallery(gallery[section][nb_all_imgs + i++]);
-			tmp_imgz.push(e_img);
-		}
+		generate_gallery(gallery[section], nb_all_imgs);
 	}
 }
 
 window.addEventListener('scroll', function(event) {
-		if (mql.matches) {
-			if (window.pageYOffset == document.documentElement.scrollHeight - document.documentElement.clientHeight) {
-				add_img_gallery();
-			}
+	if (mql.matches) {
+		if (window.pageYOffset == document.documentElement.scrollHeight - document.documentElement.clientHeight) {
+			add_img_gallery();
 		}
+	}
 });
 
 //get arg in url after #
@@ -252,7 +222,7 @@ function get_UrlArg() {
 section = get_UrlArg();
 
 
-//fill menu and gallery
+//fill menu and gallery -- main
 get_gallery(function(result) {
 	gallery = result;
 	fill_menu(gallery);
@@ -263,7 +233,7 @@ get_gallery(function(result) {
 			section = (keys.indexOf(section) != -1) ? section : keys[0];
 	}
 	if (g_gallery != null) {
-		generate_gallery(gallery, section, max_gallery);	
+		generate_gallery(gallery[section]);	
 	}
 	if (typeof init == 'function') {
 	  init();

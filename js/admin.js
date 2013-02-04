@@ -5,7 +5,7 @@ function get_selected_images() {
 	var url, urlz = []; 
 	for (var i = 0; i < ez_div.length; i++) {
 		if (ez_div[i].childNodes.length > 1) {
-			url = ez_div[i].getAttribute('data-img');
+			url = ez_div[i].getAttribute('data-src');
 			url = 'gallery/' + url;
 			urlz.push(url);
 		}
@@ -34,9 +34,11 @@ function admin_display() {
 			var section_name = e_li.getElementsByTagName('a')[0].innerHTML;
 			if (confirm('remove ' + section_name + ' ?')) {
 				var api = new API();
-				api.rm_section(section_name, function() {
+				api.rm_section(section_name, function(response) {
 					if (section_name == section) {
-						window.location.reload(true);
+						if (response.error == undefined) {
+							window.location.reload(true);
+						}
 					} else {
 						e_ul.removeChild(e_li);
 					}
@@ -150,8 +152,10 @@ function admin_display() {
 	e_bt.addEventListener('click', function(event) {
 		var urlz = get_selected_images();
 		var api = new API();
-		api.rm_images(section, urlz, function() {
-			window.location.reload();
+		api.rm_images(section, urlz, function(response) {
+			if (response.error == undefined) {
+				window.location.reload(true);
+			}
 		})
 	});
 	e_content.appendChild(e_bt);
@@ -172,8 +176,10 @@ function admin_display() {
 	e_bt.addEventListener('click', function(event) {
 		var url = get_selected_images()[0],
 				api = new API();
-		api.move_image(section, url, 'up', function() {
-			window.location.reload(true);
+		api.move_image(section, url, 'up', function(response) {
+			if (response.error == undefined) {
+				window.location.reload(true);
+			}
 		});
 	});
 	e_content.appendChild(e_bt);
@@ -187,8 +193,10 @@ function admin_display() {
 	e_bt.addEventListener('click', function(event) {
 		var url = get_selected_images()[0],
 				api = new API();
-		api.move_image(section, url, 'down', function(e) {
-			window.location.reload(true);
+		api.move_image(section, url, 'down', function(response) {
+			if (response.error == undefined) {
+				window.location.reload(true);
+			}
 		});
 	});
 	e_content.appendChild(e_bt);
@@ -208,8 +216,7 @@ document.getElementById('logbox').addEventListener('submit', function (event) {
 			password = document.getElementById('password').value;
 			
 	var api = new API();
-	api.login(login, password, function(response) {
-		var result = JSON.parse(response);
+	api.login(login, password, function(result) {
 		if (result.error != undefined) {
 			if (result.error == 401) {
 				alert('error: login/password incorrect');
@@ -236,6 +243,35 @@ function init() {
 	}
 }
 
+// return a spliced array
+function splice(arr, start, end) {
+	var a = [];
+	for (var i in arr) {
+		if (i >= start && i < end) {
+			a.push(arr[i]);
+		}
+	}
+	return a;
+}
+
+function add_images_by_group(api, limit, section, files, done) {
+	api.add_images(section, splice(files, 0, limit), function(reponse) {
+		if (done != undefined) {
+			if (response.error == undefined) {
+				window.location.reload(true);
+			}
+		} else {
+			if (files.length > limit) {
+				files = splice(files, limit, files.length);
+			} else {
+				limit = files.length;
+				done = true;
+			}
+			add_images_by_group(api, limit, section, files, done);			
+		}
+	});
+}
+
 function handleFileSelect(event) {
 	try {
 		var files = (event.target.files || event.dataTransfer.files || event.originalEvent.dataTransfer.files);
@@ -247,9 +283,19 @@ function handleFileSelect(event) {
 			}
 		}
 		var api = new API();
-		api.add_images(section || url_tag || Object.keys(gallery)[0], files, function(reponse) {
-			window.location.reload(true);
+		api.max_file_upload(function(r) { //php has a limit for the nbr of uploads, the following is a work around
+			section = section || url_tag || Object.keys(gallery)[0];
+			if (r.limit != undefined && r.limit < files.length) {
+				add_images_by_group(api, parseInt(r.limit), section, files);
+			} else {
+				api.add_images(section, files, function(reponse) {
+					if (response.error == undefined) {
+						window.location.reload(true);
+					}
+				});
+			}
 		});
+		
 	} catch(e) {
 		console.log(e);
 	}

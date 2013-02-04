@@ -10,7 +10,7 @@ API.http_request = function(method, url, data, callback) {
 	xhr.onreadystatechange = function() {
 	  if (xhr.readyState == 4 /* complete */) {
 			console.log(xhr.responseText);
-			callback(xhr.responseText);
+			callback(JSON.parse(xhr.responseText));
 	  }
 	};
 	if (data != null) {
@@ -64,6 +64,12 @@ API.prototype.login = function(login, password, callback) {
 	API.get_ajax(API.uri() + 'user/login.php', {
 		login: login,
 		password: password
+	}, callback);
+}
+
+API.prototype.max_file_upload = function(callback) {
+	API.post_ajax(API.uri() + 'max_file_upload.php', {
+		token: localStorage.getItem('token')
 	}, callback);
 }
 
