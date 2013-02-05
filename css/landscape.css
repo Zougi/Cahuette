@@ -196,6 +196,11 @@ body {
 	background-color: rgba(0, 0, 0, .5);
 }
 
+#content > progress {
+	position: absolute;
+	right: 4px;
+}
+
 /* logbox */
 #logbox {
 	position: absolute;
@@ -250,6 +255,7 @@ body {
 .bt_upload, .bt_up, .bt_down {
 	display: inline-block;
 	color: #000;
+	float: left;
 }
 
 .bt_up, .bt_down {

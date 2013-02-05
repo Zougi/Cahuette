@@ -4,9 +4,10 @@ var API = function() {}
 
 API.uri = function() { return 'api/'; };
 
-API.http_request = function(method, url, data, callback) {
+API.http_request = function(method, url, data, callback, progress) {
 	var xhr = new XMLHttpRequest();
 	xhr.open(method, url, true);
+	xhr.onprogress = progress;
 	xhr.onreadystatechange = function() {
 	  if (xhr.readyState == 4 /* complete */) {
 			console.log(xhr.responseText);
@@ -54,10 +55,10 @@ API.get_ajax = function(url, args, callback) {
 	API.http_request('GET', url, null, callback);
 };
 
-API.post_ajax = function(url, args, callback) {
+API.post_ajax = function(url, args, callback, progress) {
 	var formData = API.format_post_data(args);
 	
-	API.http_request('POST', url, formData, callback);
+	API.http_request('POST', url, formData, callback, progress);
 };
 
 API.prototype.login = function(login, password, callback) {
@@ -73,12 +74,12 @@ API.prototype.max_file_upload = function(callback) {
 	}, callback);
 }
 
-API.prototype.add_images = function(section, files, callback) {		
+API.prototype.add_images = function(section, files, callback, progress) {		
 	API.post_ajax(API.uri() + 'gallery/add.php', {
 		token: localStorage.getItem('token'),
 		section: section,
 		file: files
-	}, callback);
+	}, callback, progress);
 };
 
 API.prototype.rm_images = function(section, urlz, callback) {

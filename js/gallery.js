@@ -2,7 +2,7 @@
 
 var landscape_max_height = 540,
 		landscape_max_width = 380;
-var gallery, section, total_width;
+var gallery, section, total_width, total_height;
 
 /* get obj gallery from json */
 function get_gallery(success) {
@@ -78,6 +78,7 @@ function generate_gallery(imgz, iterator) {
 	if (iterator == undefined) {
 		iterator = 0;
 		total_width = 0;
+		total_height = 0;
 		clear_gallery();
 	}
 	
@@ -86,59 +87,74 @@ function generate_gallery(imgz, iterator) {
 	
 	var img =  imgz[iterator],
 			n_img = new Image();
-	n_img.src = img.url;
-	n_img.onload = function(event) {
-		
-		//resize image to canva
-		var resized_img = (
-			window.matchMedia("only screen and (max-width:480px)").matches
-			? img_resize(event.target, null, landscape_max_width)
-			: img_resize(event.target, landscape_max_height)
-		);
-		e_img.appendChild(resized_img);
-		
-		//add infos to image
-		var e_img_attr = document.createAttribute('data-src');
-		e_img_attr.nodeValue = this.src.substr(this.src.lastIndexOf('/') + 1);
-		e_img.setAttributeNode(e_img_attr);
 			
-		e_img_attr = document.createAttribute('class');
-		e_img_attr.nodeValue = 'img';
-		e_img.setAttributeNode(e_img_attr);
+	if (img != undefined) {
+		n_img.src = img.url;
+		n_img.onload = function(event) {
 	
-		//image can be selected to be manipulated if user is admin
-		var btz = null;
-		e_img.addEventListener('click', function(event) {
-			var elem = event.target.parentNode,
-					token = localStorage.getItem('token');
-			if (token != undefined && token != null) {
-				if (elem.childNodes.length == 1) {
-					elem.appendChild(document.createElement('span'));
-				} else {
-					elem.removeChild(elem.lastChild);
+			//resize image to canva
+			var resized_img = (
+				window.matchMedia("only screen and (max-width:480px)").matches
+				? img_resize(event.target, null, landscape_max_width)
+				: img_resize(event.target, landscape_max_height)
+			);
+			e_img.appendChild(resized_img);
+	
+			//add infos to image
+			var e_img_attr = document.createAttribute('data-src');
+			e_img_attr.nodeValue = this.src.substr(this.src.lastIndexOf('/') + 1);
+			e_img.setAttributeNode(e_img_attr);
+		
+			e_img_attr = document.createAttribute('class');
+			e_img_attr.nodeValue = 'img';
+			e_img.setAttributeNode(e_img_attr);
+
+			//image can be selected to be manipulated if user is admin
+			var btz = null;
+			e_img.addEventListener('click', function(event) {
+				var elem = event.target.parentNode,
+						token = localStorage.getItem('token');
+				if (token != undefined && token != null) {
+					if (elem.childNodes.length == 1) {
+						elem.appendChild(document.createElement('span'));
+					} else {
+						elem.removeChild(elem.lastChild);
+					}
+					if (btz == null) {
+						btz = document.querySelectorAll('.bt_up, .bt_down');
+					}
+					var nbr_imgz = (get_selected_images()).length;
+					for (var i = 0; i < btz.length; i++) {
+						btz[i].className = btz[i].className.replace(/add_inline|remove/, '')
+																+ ' ' + (nbr_imgz == 1 ? 'add_inline' : 'remove');
+					}
 				}
-				if (btz == null) {
-					btz = document.querySelectorAll('.bt_up, .bt_down');
+			});
+	
+			//insert the image at last position
+			g_gallery.insertBefore(e_img, e_load);
+	
+			//add another image if there is space to fill on the block
+			total_width += resized_img.width;
+			total_height += resized_img.height;
+
+			if (mql.matches) {
+				e_gallery_height = window.innerHeight;
+				if (total_height < e_gallery_height && imgz.length != iterator + 1) {
+					generate_gallery(imgz, ++iterator);
 				}
-				var nbr_imgz = (get_selected_images()).length;
-				for (var i = 0; i < btz.length; i++) {
-					btz[i].className = btz[i].className.replace(/add_inline|remove/, '')
-															+ ' ' + (nbr_imgz == 1 ? 'add_inline' : 'remove');
+			} else {
+				e_gallery_width = window.innerWidth;
+				if (total_width < e_gallery_width && imgz.length != iterator + 1) {
+					generate_gallery(imgz, ++iterator);
 				}
 			}
-		});
-		
-		//insert the image at last position
-		g_gallery.insertBefore(e_img, e_load);
-		
-		//add another image if there is space to fill on the block
-		total_width += mql.matches ? resized_img.height : resized_img.width;
-		e_gallery_width = mql.matches ? e_gallery.offsetHeight : e_gallery.offsetWidth;
-		if (!(total_width > e_gallery_width || imgz.length == iterator + 1)) {
-			generate_gallery(imgz, ++iterator);	
+			
+			if (imgz.length == iterator + 1) {
+				//hide loader
+				e_load.className = 'remove';
+			}
 		}
-		//hide loader
-		e_load.className = 'remove';
 	};
 }
 

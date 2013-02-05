@@ -89,6 +89,8 @@ function admin_display() {
 		window.history.pushState(null, document.title, '#' +  e_input.value);
 		section = e_input.value;
 		e_input.value = '';
+		var e_input_file = document.querySelectorAll('input[type=file]')[0];
+		e_input_file.className = e_input_file.className.replace(/remove/, '');
 	});
 	e_bt.appendChild(document.createTextNode('add'));
 	e_menu.appendChild(e_bt);
@@ -117,12 +119,31 @@ function admin_display() {
 	e_input_u.setAttributeNode(attr);
 	
 	attr = document.createAttribute('class');
-	attr.nodeValue = 'bt_upload';
+	var val = 'bt_upload';
+	if (ez_li.length == 0) {
+		val += ' remove';
+	}
+	attr.nodeValue = val;
 	e_input_u.setAttributeNode(attr);
 	e_input_u.addEventListener('change', handleFileSelect, false);
 	e_content.appendChild(e_input_u);
 	
+	var e_progressbar = document.createElement('progress');
 	
+	attr = document.createAttribute('class');
+	attr.nodeValue = 'remove';
+	e_progressbar.setAttributeNode(attr);
+
+	attr = document.createAttribute('value');
+	attr.nodeValue = 0;
+	e_progressbar.setAttributeNode(attr);
+
+	attr = document.createAttribute('max');
+	attr.nodeValue = 100;
+	e_progressbar.setAttributeNode(attr);
+	
+	e_content.appendChild(e_progressbar);
+
 	var e_gallery = document.getElementById('gallery');
 	e_gallery.addEventListener('dragenter', function() {
 			if (event.target.className == 'img') {
@@ -254,6 +275,19 @@ function splice(arr, start, end) {
 	return a;
 }
 
+function updateProgress(evt) {
+  if (evt.lengthComputable) {
+		var e_progress = document.querySelectorAll('progress')[0];
+		
+    var percentLoaded = Math.round((evt.loaded / evt.total) * 100);
+
+    if (percentLoaded < 100) {
+      e_progress.setAttribute('value', percentLoaded + '%');
+      e_progress.textContent = percentLoaded + '%';
+    }
+  }
+}
+
 function add_images_by_group(api, limit, section, files, done) {
 	api.add_images(section, splice(files, 0, limit), function(reponse) {
 		if (done != undefined) {
@@ -269,10 +303,12 @@ function add_images_by_group(api, limit, section, files, done) {
 			}
 			add_images_by_group(api, limit, section, files, done);			
 		}
-	});
+	}, updateProgress);
 }
 
 function handleFileSelect(event) {
+	var e_progress = document.querySelectorAll('progress')[0];
+	e_progress.className = e_progress.className.replace(/remove/, '');
 	try {
 		var files = (event.target.files || event.dataTransfer.files || event.originalEvent.dataTransfer.files);
 
@@ -288,11 +324,11 @@ function handleFileSelect(event) {
 			if (r.limit != undefined && r.limit < files.length) {
 				add_images_by_group(api, parseInt(r.limit), section, files);
 			} else {
-				api.add_images(section, files, function(reponse) {
-					if (response.error == undefined) {
+				api.add_images(section, files, function(resp) {
+					if (resp.response == "success") {
 						window.location.reload(true);
 					}
-				});
+				}, updateProgress);
 			}
 		});
 		

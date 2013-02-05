@@ -33,7 +33,7 @@ function add_to_gallery_json($section, $img_json) {
 	save_gallery_json($gallery);
 }
 
-$errors = array();
+$errors = "";
 $fileTypes = array('jpg','jpeg','gif','png', 'bmp');
 //return tab[url & name]
 function save_files_to_disk($files) {
@@ -46,26 +46,31 @@ function save_files_to_disk($files) {
 		$name = pathinfo($value['name'], PATHINFO_BASENAME);
 		if (in_array($extension, $fileTypes)) {
 			$filename = uniqid() . '.' . $extension;
-			move_uploaded_file($value['tmp_name'], $gallery_path . $filename);
-			$img_json[] = (object)array(
-			    "name" => $name,
-			    "url" => $gallery_virtual_path . $filename,
-			);
+			if (move_uploaded_file($value['tmp_name'], $gallery_path . $filename)) {
+				$img_json[] = (object)array(
+				    "name" => $name,
+				    "url" => $gallery_virtual_path . $filename,
+				);
+			} else {
+				$errors += ($name . " upload failed. file creation error");
+			}
 		} else {
-			$errors[] = ($name . " upload failed. ");
+			$errors += ($name . " upload failed. wrong extension ");
 		}
 	}
 	return $img_json;
 }
 
 //main
-if (!empty($_FILES) && isset($_POST['token']) && isset($_POST['section'])) {
+if (isset($_POST['token']) && isset($_POST['section'])) {
 	if ($_POST['token'] != $_SESSION['token']) {
 		display_error("invalid token");
 	} else {
 		$img_json = save_files_to_disk($_FILES);
-		add_to_gallery_json($_POST['section'], $img_json);
-		if (sizeof($errors) == 0) {
+		if ($img_json != null) {
+			add_to_gallery_json($_POST['section'], $img_json);
+		}
+		if ($errors == "") {
 			display_success();	
 		} else {
 			display_error($errors . "Format must be: jpg, jpeg, gif, png or bmp");
