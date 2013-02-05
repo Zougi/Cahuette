@@ -11,7 +11,13 @@ API.http_request = function(method, url, data, callback, progress) {
 	xhr.onreadystatechange = function() {
 	  if (xhr.readyState == 4 /* complete */) {
 			console.log(xhr.responseText);
-			callback(JSON.parse(xhr.responseText));
+			var result;
+			try {
+				result = JSON.parse(xhr.responseText);
+			} catch (e) {
+				result = null;
+			}
+			callback(result);
 	  }
 	};
 	if (data != null) {

@@ -12,7 +12,6 @@ function remove_section($gallery, $post_section) {
 		if ($section_name == $post_section) {
 
 			foreach ($section as $n => $img) {
-				echo var_dump($img['url']);
 				unlink('../../' . $img['url']);
 			}
 			unset($gallery[$section_name]);

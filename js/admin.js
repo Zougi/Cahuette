@@ -90,7 +90,7 @@ function admin_display() {
 		section = e_input.value;
 		e_input.value = '';
 		var e_input_file = document.querySelectorAll('input[type=file]')[0];
-		e_input_file.className = e_input_file.className.replace(/remove/, '');
+		e_input_file.className = e_input_file.className.replace(/add_inline|remove/, '');
 	});
 	e_bt.appendChild(document.createTextNode('add'));
 	e_menu.appendChild(e_bt);
@@ -167,7 +167,7 @@ function admin_display() {
 	//remove files
 	e_bt = document.createElement('button');
 	attr = document.createAttribute('class');
-	attr.nodeValue = 'bt_upload';
+	attr.nodeValue = 'bt_upload bt_del remove';
 	e_bt.setAttributeNode(attr);
 	e_bt.appendChild(document.createTextNode('remove'));
 	e_bt.addEventListener('click', function(event) {
@@ -275,12 +275,17 @@ function splice(arr, start, end) {
 	return a;
 }
 
+var nb_files = 0, n_files = 0;
 function updateProgress(evt) {
   if (evt.lengthComputable) {
 		var e_progress = document.querySelectorAll('progress')[0];
 		
     var percentLoaded = Math.round((evt.loaded / evt.total) * 100);
 
+		if (nb_files != 0) {
+			percentLoaded = (percentLoaded / nb_files) + ((n_files  / nb_files) * 100);
+		}
+console.log(percentLoaded);
     if (percentLoaded < 100) {
       e_progress.setAttribute('value', percentLoaded + '%');
       e_progress.textContent = percentLoaded + '%';
@@ -288,12 +293,10 @@ function updateProgress(evt) {
   }
 }
 
-function add_images_by_group(api, limit, section, files, done) {
+function add_images_by_group(callback, api, limit, section, files, done) {
 	api.add_images(section, splice(files, 0, limit), function(reponse) {
 		if (done != undefined) {
-			if (response.error == undefined) {
-				window.location.reload(true);
-			}
+			callback();
 		} else {
 			if (files.length > limit) {
 				files = splice(files, limit, files.length);
@@ -301,9 +304,19 @@ function add_images_by_group(api, limit, section, files, done) {
 				limit = files.length;
 				done = true;
 			}
-			add_images_by_group(api, limit, section, files, done);			
+			n_files = ++n_files;
+			add_images_by_group(callback, api, limit, section, files, done);			
 		}
 	}, updateProgress);
+}
+
+function add_images_callback () {
+	get_gallery(function(result) {
+		gallery = result;
+		if (g_gallery != null) {
+			generate_gallery(gallery[section]);	
+		}
+	});
 }
 
 function handleFileSelect(event) {
@@ -322,11 +335,13 @@ function handleFileSelect(event) {
 		api.max_file_upload(function(r) { //php has a limit for the nbr of uploads, the following is a work around
 			section = section || url_tag || Object.keys(gallery)[0];
 			if (r.limit != undefined && r.limit < files.length) {
-				add_images_by_group(api, parseInt(r.limit), section, files);
+				nb_files = files.length;
+				add_images_by_group(add_images_callback, api, parseInt(r.limit), section, files);
 			} else {
+				nb_files = 0;
 				api.add_images(section, files, function(resp) {
 					if (resp.response == "success") {
-						window.location.reload(true);
+						add_images_callback();
 					}
 				}, updateProgress);
 			}

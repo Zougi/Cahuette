@@ -81,7 +81,7 @@ function generate_gallery(imgz, iterator) {
 		total_height = 0;
 		clear_gallery();
 	}
-	
+
 	//display loader
 	e_load.className = mql.matches ? 'add' : 'add_inline';
 	
@@ -127,6 +127,12 @@ function generate_gallery(imgz, iterator) {
 					for (var i = 0; i < btz.length; i++) {
 						btz[i].className = btz[i].className.replace(/add_inline|remove/, '')
 																+ ' ' + (nbr_imgz == 1 ? 'add_inline' : 'remove');
+					}
+					var del = document.querySelectorAll('.bt_del')[0];
+					if (nbr_imgz > 0) {
+						del.className = del.className.replace(/add_inline|remove/, '');
+					} else {
+						del.className += ' remove';
 					}
 				}
 			});
@@ -176,6 +182,7 @@ function clear_gallery() {
 			g_gallery.removeChild(all_imgs[all_imgs.length - 1]);
 		}
 	}
+	e_load.className = 'remove';
 }
 
 /* add section to menu */

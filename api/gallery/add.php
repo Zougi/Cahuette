@@ -58,7 +58,7 @@ function save_files_to_disk($files) {
 			$errors += ($name . " upload failed. wrong extension ");
 		}
 	}
-	return $img_json;
+	return isset($img_json) ? $img_json : null;
 }
 
 //main
@@ -73,7 +73,7 @@ if (isset($_POST['token']) && isset($_POST['section'])) {
 		if ($errors == "") {
 			display_success();	
 		} else {
-			display_error($errors . "Format must be: jpg, jpeg, gif, png or bmp");
+			display_error($errors . "Format must be an image: " . implode(',', $fileTypes));
 		}
 	}
 } else {
