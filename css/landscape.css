@@ -299,3 +299,20 @@ footer > a {
 	color: #000;
 	text-decoration: none;
 }
+
+#fullscreen {
+	position: fixed;
+	right: 0;
+	left: 0;
+	top: 0;
+	bottom: 0;
+	background: rgba(0, 0, 0, 0.7);
+	z-index: 2;
+}
+
+#fullscreen > canvas {
+	position: absolute;
+/*	top: 50%; */
+	left: 50%;
+	text-align: center;
+}

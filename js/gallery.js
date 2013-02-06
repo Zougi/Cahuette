@@ -91,15 +91,7 @@ function generate_gallery(imgz, iterator) {
 	if (img != undefined) {
 		n_img.src = img.url;
 		n_img.onload = function(event) {
-	
-			//resize image to canva
-			var resized_img = (
-				window.matchMedia("only screen and (max-width:480px)").matches
-				? img_resize(event.target, null, landscape_max_width)
-				: img_resize(event.target, landscape_max_height)
-			);
-			e_img.appendChild(resized_img);
-	
+			
 			//add infos to image
 			var e_img_attr = document.createAttribute('data-src');
 			e_img_attr.nodeValue = this.src.substr(this.src.lastIndexOf('/') + 1);
@@ -108,6 +100,14 @@ function generate_gallery(imgz, iterator) {
 			e_img_attr = document.createAttribute('class');
 			e_img_attr.nodeValue = 'img';
 			e_img.setAttributeNode(e_img_attr);
+	
+			//resize image to canvas
+			var resized_img = (
+				window.matchMedia("only screen and (max-width:480px)").matches
+				? img_resize(event.target, null, landscape_max_width)
+				: img_resize(event.target, landscape_max_height)
+			);
+			e_img.appendChild(resized_img);
 
 			//image can be selected to be manipulated if user is admin
 			var btz = null;
@@ -133,6 +133,37 @@ function generate_gallery(imgz, iterator) {
 						del.className = del.className.replace(/add_inline|remove/, '');
 					} else {
 						del.className += ' remove';
+					}
+				}
+			});
+			
+			e_img.addEventListener('dblclick', function(event) {
+				if (!mql.matches) {
+					var e_full = document.getElementById('fullscreen');
+					e_full.className = '';
+					e_full.addEventListener('click', function() {
+						this.className = 'remove';
+						try {
+							this.removeChild(this.firstChild);
+						} catch (e) {}
+					});
+					var img = event.target.parentNode;
+					
+					var	n_img = new Image();
+					n_img.src = 'gallery/' + img.getAttribute('data-src');
+					n_img.onload = function(event) {
+						var canvas,
+								window_width = window.innerWidth;
+						
+						if (this.width > window_width) {
+							canvas = img_resize(this, window.innerHeight);
+							var attr = document.createAttribute('style');
+							attr.nodeValue = 'margin-left: -' + (canvas.width / 2) + 'px;';
+							canvas.setAttributeNode(attr);
+						} else {
+							canvas = img_resize(this, null, window_width);
+						}
+						e_full.appendChild(canvas);
 					}
 				}
 			});
@@ -182,6 +213,7 @@ function clear_gallery() {
 			g_gallery.removeChild(all_imgs[all_imgs.length - 1]);
 		}
 	}
+	var e_load = document.getElementById('load');
 	e_load.className = 'remove';
 }
 
@@ -211,11 +243,11 @@ function add_menu_section(name, e_menu, e_ul) {
 //trigger whenever gallery has been fully scrolled to the right
 var g_gallery = document.getElementById('gallery');
 if (g_gallery != null) {
-	var e_load = document.getElementById('load');
 	g_gallery.addEventListener('scroll', function() {
 		if (g_gallery.scrollWidth - g_gallery.offsetWidth <= g_gallery.scrollLeft)
 		{
 			add_img_gallery();
+			flag = true;
 		}
 	});
 }

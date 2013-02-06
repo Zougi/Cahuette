@@ -283,7 +283,7 @@ function updateProgress(evt) {
     var percentLoaded = Math.round((evt.loaded / evt.total) * 100);
 
 		if (nb_files != 0) {
-			percentLoaded = (percentLoaded / nb_files) + ((n_files  / nb_files) * 100);
+			percentLoaded = Math.round((((percentLoaded / 100) / nb_files) + (n_files / nb_files)) * 100);
 		}
 console.log(percentLoaded);
     if (percentLoaded < 100) {
