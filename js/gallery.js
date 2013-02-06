@@ -170,6 +170,7 @@ function generate_gallery(imgz, iterator) {
 	
 			//insert the image at last position
 			g_gallery.insertBefore(e_img, e_load);
+			disable_scroll = false;
 	
 			//add another image if there is space to fill on the block
 			total_width += resized_img.width;
@@ -240,12 +241,15 @@ function add_menu_section(name, e_menu, e_ul) {
 	e_ul.appendChild(e_li);
 }
 
+var disable_scroll = false;
+
 //trigger whenever gallery has been fully scrolled to the right
 var g_gallery = document.getElementById('gallery');
 if (g_gallery != null) {
 	g_gallery.addEventListener('scroll', function() {
-		if (g_gallery.scrollWidth - g_gallery.offsetWidth <= g_gallery.scrollLeft)
+		if ((g_gallery.scrollWidth - g_gallery.offsetWidth <= g_gallery.scrollLeft) && !disable_scroll)
 		{
+			disable_scroll = true;
 			add_img_gallery();
 			flag = true;
 		}
@@ -262,7 +266,8 @@ function add_img_gallery() {
 
 window.addEventListener('scroll', function(event) {
 	if (mql.matches) {
-		if (window.pageYOffset == document.documentElement.scrollHeight - document.documentElement.clientHeight) {
+		if ((window.pageYOffset == document.documentElement.scrollHeight - document.documentElement.clientHeight) && !disable_scroll) {
+			disable_scroll = true;
 			add_img_gallery();
 		}
 	}
