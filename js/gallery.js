@@ -153,17 +153,10 @@ function generate_gallery(imgz, iterator) {
 					var	n_img = new Image();
 					n_img.src = 'gallery/' + img.getAttribute('data-src');
 					n_img.onload = function(event) {
-						var canvas,
-								window_width = window.innerWidth;
-						
-						if (this.width <= window_width) {
-							canvas = img_resize(this, window.innerHeight);
-							var attr = document.createAttribute('style');
-							attr.nodeValue = 'margin-left: -' + (canvas.width / 2) + 'px;';
-							canvas.setAttributeNode(attr);
-						} else {
-							canvas = img_resize(this, null, window_width);
-						}
+						var canvas = img_resize(this, window.innerHeight);
+						var attr = document.createAttribute('style');
+						attr.nodeValue = 'margin-left: -' + (canvas.width / 2) + 'px;';
+						canvas.setAttributeNode(attr);
 						e_full.appendChild(canvas);
 					}
 				}
