@@ -52,19 +52,26 @@ window.onresize = function(e) {
 	}
 }
 
-/* resize image using canvas */
+/* resize image using canvas. can only be downsized. keep proportions */
 function img_resize(img, height, width) {
 	var e_canvas = document.createElement('canvas');
 	if (height != null) {
 		e_canvas.width = Math.round(height * (img.width / img.height));
 	  e_canvas.height = height;
 	} else {
-		e_canvas.height = Math.round(width * (img.height / img.width));
 		e_canvas.width = width;
+		e_canvas.height = Math.round(width * (img.height / img.width));
 	}
+	
+	//prevent upsize
+	if (e_canvas.width > img.width || e_canvas.height > img.height) {
+		e_canvas.width = img.width;
+		e_canvas.height = img.height;
+	}
+	
   var ctx = e_canvas.getContext('2d');
   ctx.drawImage(img,0, 0, img.width, img.height, 0, 0, e_canvas.width, e_canvas.height);
-  return e_canvas;
+  return (height != null && width != null) ? img_resize(e_canvas, null, width) : e_canvas;
 }
 
 /* add images to the gallery */
@@ -153,9 +160,10 @@ function generate_gallery(imgz, iterator) {
 					var	n_img = new Image();
 					n_img.src = 'gallery/' + img.getAttribute('data-src');
 					n_img.onload = function(event) {
-						var canvas = img_resize(this, window.innerHeight);
+						var canvas = img_resize(this, window.innerHeight, window.innerWidth);
 						var attr = document.createAttribute('style');
 						attr.nodeValue = 'margin-left: -' + (canvas.width / 2) + 'px;';
+						attr.nodeValue += 'margin-top: ' + ((window.innerHeight - canvas.height) / 2) + 'px;';
 						canvas.setAttributeNode(attr);
 						e_full.appendChild(canvas);
 					}
