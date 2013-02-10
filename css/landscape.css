@@ -90,10 +90,7 @@ body {
 }
 
 #menu > ul > li:hover {
-	list-style-type: square;
-	padding-left: 15px;
 	font-size: 13pt;
-	background-color: #eeeeee;
 }
 
 #menu > ul > li > button {
