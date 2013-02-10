@@ -145,8 +145,12 @@ function generate_gallery(imgz, iterator) {
 			});
 			
 			//display image fullscreen
-			e_img.addEventListener('dblclick', function(event) {
-				if (!mql.matches) {
+			old_click_position = '';
+			e_img.addEventListener('mousedown', function(event) {
+				old_click_position = event.screenX + '' + event.screenY;
+			});
+			e_img.addEventListener('mouseup', function(event) {
+				if (!mql.matches && (old_click_position == event.screenX + '' + event.screenY)) {
 					var e_full = document.getElementById('fullscreen');
 					e_full.className = '';
 					e_full.addEventListener('click', function() { //quit fullscreen
@@ -302,19 +306,18 @@ get_gallery(function(result) {
 	}
 });
 
-
-//drag gallery
+/* drag gallery */
 var dragged, offsetX,
  		g_gallery = document.getElementById('gallery');
 if (g_gallery != null) {
 	g_gallery.onmousedown = function(event) {
 		dragged = false;
-	    if (event.button == 2) return;
-			if (event.screenY < g_gallery.parentNode.offsetHeight - 5) { //correct bug no mouseup trigger after use of scrollbar
-				dragged = true;
-			}
-	    offsetX = event.screenX - this.offsetLeft;
-	    return false;
+	  if (event.button == 2) return;
+		if (event.screenY < g_gallery.parentNode.offsetHeight - 5) { //correct bug no mouseup trigger after use of scrollbar
+			dragged = true;
+		}
+    offsetX = event.screenX - this.offsetLeft;
+    return false;
 	}
 
 	g_gallery.onmousemove = function(event) {
