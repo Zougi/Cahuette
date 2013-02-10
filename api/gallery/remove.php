@@ -32,7 +32,7 @@ function remove_images($gallery, $post) {
 					if (strrpos($post_name, 'url') == 0) {
 						if ($img['url'] == $url) {
 							unlink('../../' . $img['url']);
-							unset($gallery[$section_name][$n]);
+							array_splice($gallery[$section_name], $n, 1);
 							break;
 						}	
 					}
@@ -61,3 +61,4 @@ if (isset($_POST['token']) && isset($_POST['section'])) {
 } else {
 	display_error(400);
 }
+?>

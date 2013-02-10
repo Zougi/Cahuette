@@ -61,3 +61,4 @@ if (isset($_POST['token']) && isset($_POST['section']) && isset($_POST['move']))
 } else {
 	display_error(400);
 }
+?>
