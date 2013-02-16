@@ -112,10 +112,8 @@ body {
 }
 
 #menu > ul > li:hover {
-	list-style-type: square;
 	padding-left: 0;
 	font-size: 13pt;
-	background-color: #eeeeee;
 }
 
 #menu > ul > li > button {
@@ -137,7 +135,7 @@ body {
 
 #menu > button:nth-last-child(2) {
 	margin-left: 30px;
-} 
+}
 
 /* content */
 #content {

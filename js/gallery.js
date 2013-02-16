@@ -1,7 +1,6 @@
 /* MaxPhotographer - gallery.js */
 
-var landscape_max_height = 540,
-		landscape_max_width = 380;
+var landscape_max_height = 540;
 var gallery, section, total_width, total_height;
 
 /* get obj gallery from json */
@@ -96,7 +95,7 @@ function generate_gallery(imgz, iterator) {
 			n_img = new Image();
 			
 	if (img != undefined) {
-		n_img.src = img.url;
+
 		n_img.onload = function(event) {
 			
 			//add infos to image
@@ -111,7 +110,7 @@ function generate_gallery(imgz, iterator) {
 			//resize image to canvas
 			var resized_img = (
 				window.matchMedia("only screen and (max-width:480px)").matches
-				? img_resize(event.target, null, landscape_max_width)
+				? img_resize(event.target, null, window.innerWidth)
 				: img_resize(event.target, landscape_max_height)
 			);
 			e_img.appendChild(resized_img);
@@ -162,7 +161,6 @@ function generate_gallery(imgz, iterator) {
 					var img = event.target.parentNode;
 					
 					var	n_img = new Image();
-					n_img.src = 'gallery/' + img.getAttribute('data-src');
 					n_img.onload = function(event) {
 						var canvas = img_resize(this, window.innerHeight, window.innerWidth);
 						var attr = document.createAttribute('style');
@@ -170,7 +168,8 @@ function generate_gallery(imgz, iterator) {
 						attr.nodeValue += 'margin-top: ' + ((window.innerHeight - canvas.height) / 2) + 'px;';
 						canvas.setAttributeNode(attr);
 						e_full.appendChild(canvas);
-					}
+					};
+					n_img.src = 'gallery/' + img.getAttribute('data-src');
 				}
 			});
 	
@@ -200,6 +199,7 @@ function generate_gallery(imgz, iterator) {
 			}
 		}
 	};
+	n_img.src = img.url;
 }
 
 /* fill the menu*/
