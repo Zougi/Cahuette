@@ -258,7 +258,7 @@ body {
 	margin-left: 10px;
 }
 
-#content > #gallery > #load {
+#content > #gallery > .load {
 	display: none;
 	white-space: normal;
 	width: 100px;
@@ -267,7 +267,7 @@ body {
 	vertical-align: middle;
 }
 
-#content > #gallery > #load > div {
+#content > #gallery > .load > div {
 	position: relative;
 	width: 100px;
 	height: 100px;
@@ -310,3 +310,21 @@ footer > a {
 	left: 50%;
 	text-align: center;
 }
+
+#fullscreen > .load {
+	display: none;
+	white-space: normal;
+	width: 100px;
+	height: 540px;
+	margin: 0;
+	vertical-align: middle;
+}
+
+#fullscreen > .load > div {
+	position: relative;
+	width: 100px;
+	height: 100px;
+	margin-top: 220px;
+	background: url('loader.gif') center no-repeat;
+}
+

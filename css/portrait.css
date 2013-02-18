@@ -275,16 +275,15 @@ body {
 	margin-left: 10px;
 }
 
-#content > #gallery > #load {
+#content > #gallery > .load {
 	display: none;
 	white-space: normal;
 	width: auto;
 	height: 57px;
-	border: 1px solid #eeeeee;
 	margin: 0;
 }
 
-#content > #gallery > #load > div {
+#content > #gallery > .load > div {
 	position: relative;
 	width: auto;
 	height: 40px;

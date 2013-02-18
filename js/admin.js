@@ -254,7 +254,7 @@ document.getElementById('logbox').addEventListener('submit', function (event) {
 	return false;
 });
 
-function init() {
+function init_admin_panel() {
 	//switch to admin display if is connected
 	var token = localStorage.getItem('token');
 	if (token != undefined && token != null) {
