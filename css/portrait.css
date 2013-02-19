@@ -184,17 +184,6 @@ body {
 	display: block;
 }
 
-#content > #gallery_bar {
-	position: absolute;
-	right: 0;	
-}
-
-#content > #gallery_bar > * {
-	display: inline-block;
-	white-space: normal;
-	margin-right: 20px;
-}
-
 #content > #gallery_bar >:first-child {
 	margin-right: 60px;
 	color: #000;

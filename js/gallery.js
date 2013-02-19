@@ -4,7 +4,7 @@ var landscape_max_height = 540,
 		uri_login = 'login';
 var gallery, section, total_width, total_height, nb_image_processed, old_url;
 var e_gallery = document.getElementById('gallery'),
-		e_load = e_gallery.querySelectorAll('.load')[0];
+		e_load = document.getElementById('load_gallery');
 
 /* get obj gallery from json */
 function get_gallery(success) {
@@ -76,7 +76,6 @@ function img_resize(img, height, width) {
   return (height != null && width != null) ? img_resize(e_canvas, null, width) : e_canvas;
 }
 
-var allow_preload = true;
 /* add images to the gallery */
 function generate_gallery(imgz, iterator, preload) {
 	var e_img = document.createElement('div'),
@@ -87,22 +86,19 @@ function generate_gallery(imgz, iterator, preload) {
 		total_width = 0;
 		total_height = 0;
 		clear_gallery();
-		old_url = '';
-	}
-	if (preload == undefined) {
-		preload = false;
+		old_url = [];
 	}
 	
 	//display loader
-	if (!preload) {
+	if (preload == undefined || preload == false) {
 		e_load.className = e_load.className.replace(/add_inline|add|remove/, '');
 	  e_load.className += ' ' + (mql.matches ? 'add' : 'add_inline');	
 	} 
 		var img =  imgz[iterator],
 			n_img = new Image();
 			
-	if (img != undefined && img.url != old_url) {
-		if (!preload) {
+	if (img != undefined && old_url.indexOf(img.url) == -1) {
+		if (preload == undefined || preload == false) {
 			nb_image_processed = iterator + 1;
 		}
 		old_url = img.url;
@@ -184,7 +180,7 @@ function generate_gallery(imgz, iterator, preload) {
 			});
 	
 			//insert the image at last position
-			if (preload) {
+			if (!(preload == undefined || preload == false)) {
 				g_preload.push(e_img);
 			} else {
 				if (g_preload.length > 0) {
@@ -213,7 +209,7 @@ function generate_gallery(imgz, iterator, preload) {
 					e_load.className = e_load.className.replace(/add_inline|add/, 'remove');
 				if (total_size < gallery_size) {
 					generate_gallery(imgz, ++iterator);
-				} else if (allow_preload) {
+				} else if (preload == undefined || preload == true) {
 					generate_gallery(imgz, ++iterator, true);
 				}	
 			} else {
@@ -289,9 +285,8 @@ if (g_gallery != null) {
 function add_img_gallery() {
 	var nb_all_imgs = nb_image_processed || g_gallery.getElementsByClassName('img').length,
 			nb_gallery = gallery[section].length;
-	allow_preload = false;
  	if (nb_gallery > nb_all_imgs) {
-		generate_gallery(gallery[section], nb_all_imgs);
+		generate_gallery(gallery[section], nb_all_imgs, false);
 	}
 }
 
