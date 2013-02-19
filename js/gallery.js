@@ -2,10 +2,9 @@
 
 var landscape_max_height = 540,
 		uri_login = 'login';
-var gallery, section, total_width, total_height, nb_image_processed;
-var old_url,
-	e_gallery = document.getElementById('gallery'),
-	e_load = e_gallery.querySelectorAll('.load')[0];
+var gallery, section, total_width, total_height, nb_image_processed, old_url;
+var e_gallery = document.getElementById('gallery'),
+		e_load = e_gallery.querySelectorAll('.load')[0];
 
 /* get obj gallery from json */
 function get_gallery(success) {
@@ -95,10 +94,11 @@ function generate_gallery(imgz, iterator, preload) {
 	}
 
 	//display loader
-	e_load.className = e_load.className.replace(/add_inline|add|remove/, '');
-  e_load.className = mql.matches && !preload ? 'add' : 'add_inline';
-
-	var img =  imgz[iterator],
+	if (!preload) {
+		e_load.className = e_load.className.replace(/add_inline|add|remove/, '');
+	  e_load.className += ' ' + (mql.matches ? 'add' : 'add_inline');	
+	} 
+		var img =  imgz[iterator],
 			n_img = new Image();
 			
 	if (img != undefined && img.url != old_url) {
@@ -210,17 +210,16 @@ function generate_gallery(imgz, iterator, preload) {
 			
 			// if there is space to fill on the gallery and still images in it: add an image
 			if (imgz.length != iterator + 1) {
+					e_load.className = e_load.className.replace(/add_inline|add/, 'remove');
 				if (total_size < gallery_size) {
 					generate_gallery(imgz, ++iterator);
 				} else if (g_preload.length) {
 					generate_gallery(imgz, ++iterator, true);
 				}	
+			} else {
+				//hide loader
+				e_load.className = e_load.className.replace(/add_inline|add/, 'remove');
 			}
-			
-			// if (imgz.length == iterator + 1) {
-			// 	//hide loader
-			// 	e_load.className = e_load.className.replace(/add_inline|add/, 'remove');
-			// }
 		};
 		n_img.src = img.url;
 	}

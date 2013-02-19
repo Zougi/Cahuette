@@ -135,6 +135,7 @@ body {
 	width: auto;
 	margin-top: 13px;
 	white-space: nowrap;
+	min-height: 560px;
 }
 
 #content > #gallery > .img {
