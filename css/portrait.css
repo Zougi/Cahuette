@@ -168,9 +168,8 @@ body {
 	white-space: normal;
 	background: no-repeat center;
 	height: auto;
-	min-width: 380px;
-	background-size: 380px auto;
 	margin: 3px 3px 3px 3px !important;
+	overflow-x: hidden !important;
 }
 
 #content > #gallery >:first-child {

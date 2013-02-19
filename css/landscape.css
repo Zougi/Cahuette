@@ -118,7 +118,6 @@ body {
 #content {
 	display: inline-block;
 	float: left;
-	min-height: 500px;
 	height: 80%;
 	width: 86.18%;
 	margin-left: 4px;
@@ -136,7 +135,6 @@ body {
 	width: auto;
 	margin-top: 13px;
 	white-space: nowrap;
-	min-height: 550px;
 }
 
 #content > #gallery > .img {

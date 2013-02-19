@@ -1,8 +1,8 @@
 /* MaxPhotographer - gallery.js */
 
-var landscape_max_height =  window.innerHeight * 0.8 /*540*/,
+var landscape_max_height = 540,
 		uri_login = 'login';
-var gallery, section, total_width, total_height, nb_image_processing;
+var gallery, section, total_width, total_height, nb_image_processed;
 
 /* get obj gallery from json */
 function get_gallery(success) {
@@ -76,7 +76,7 @@ function img_resize(img, height, width) {
 
 var old_url;
 /* add images to the gallery */
-function generate_gallery(imgz, iterator) {
+function generate_gallery(imgz, iterator, preload) {
 	var e_img = document.createElement('div'),
 			e_load = document.getElementById('load'),
 			e_img_attr = document.createAttribute('style'),
@@ -89,10 +89,14 @@ function generate_gallery(imgz, iterator) {
 		total_height = 0;
 		clear_gallery();
 		old_url = '';
+		g_preload = [];
+	}
+	if (preload == undefined) {
+		preload = false;
 	}
 
 	//display loader
-	e_load.className = mql.matches ? 'add' : 'add_inline';
+	e_load.className = mql.matches && !preload ? 'add' : 'add_inline';
 	
 	var img =  imgz[iterator],
 			n_img = new Image();
@@ -115,7 +119,7 @@ function generate_gallery(imgz, iterator) {
 			var resized_img = (
 				window.matchMedia("only screen and (max-width:480px)").matches
 				? img_resize(event.target, null, window.innerWidth)
-				: img_resize(event.target, landscape_max_height)
+				: img_resize(event.target,  (window.innerHeight > landscape_max_height) ? window.innerHeight * 0.8 : landscape_max_height)
 			);
 			e_img.appendChild(resized_img);
 
@@ -178,34 +182,50 @@ function generate_gallery(imgz, iterator) {
 			});
 	
 			//insert the image at last position
-			g_gallery.insertBefore(e_img, e_load);
+			if (preload) {
+				g_preload.push(e_img);
+			} else {
+				if (g_preload.length > 0) {
+					g_gallery.insertBefore(g_preload.shift(), e_load);
+					g_preload.push(e_img);
+					console.log(1);
+				} else {
+					g_gallery.insertBefore(e_img, e_load);
+				}
+			}
 			disable_scroll = false;
 	
 			//add another image if there is space to fill on the block
 			total_width += resized_img.width;
 			total_height += resized_img.height;
 
+			var total_size, gallery_size;
 			if (mql.matches) {
-				e_gallery_height = window.innerHeight;
-				if (total_height < e_gallery_height && imgz.length != iterator + 1) {
-					generate_gallery(imgz, ++iterator);
-				}
+				total_size = total_height;
+				gallery_size = window.innerHeight;
 			} else {
-				e_gallery_width = window.innerWidth;
-				if (total_width < e_gallery_width && imgz.length != iterator + 1) {
+				total_size = total_width;
+				gallery_size = window.innerWidth;
+			}
+			
+			// if there is space to fill on the gallery and still images in it: add an image
+			if (imgz.length != iterator + 1) {
+				if (total_size < gallery_size) {
 					generate_gallery(imgz, ++iterator);
-				}
+				} else {
+					generate_gallery(imgz, ++iterator, true);
+				}	
 			}
 			
 			if (imgz.length == iterator + 1) {
 				//hide loader
 				e_load.className = 'remove';
 			}
-			//preload_gallery(imgz, ++iterator);
-		}
-	};
-	n_img.src = img.url;
+		};
+		n_img.src = img.url;
+	}
 }
+
 
 /* fill the menu*/
 function fill_menu(result) {
@@ -255,7 +275,7 @@ function add_menu_section(name, e_menu, e_ul) {
 var disable_scroll = false;
 
 //trigger whenever gallery has been fully scrolled to the right
-var g_gallery = document.getElementById('gallery');
+var g_gallery = document.getElementById('gallery'), g_preload;
 if (g_gallery != null) {
 	g_gallery.addEventListener('scroll', function() {
 		if ((g_gallery.scrollWidth - g_gallery.offsetWidth <= g_gallery.scrollLeft) && !disable_scroll)
@@ -269,8 +289,9 @@ if (g_gallery != null) {
 
 //add the next image to the gallery
 function add_img_gallery() {
-	var nb_all_imgs = nb_image_processing, //zg g_gallery.getElementsByClassName('img').length,
+	var nb_all_imgs = nb_image_processed || g_gallery.getElementsByClassName('img').length,
 			nb_gallery = gallery[section].length;
+
  	if (nb_gallery > nb_all_imgs) {
 		generate_gallery(gallery[section], nb_all_imgs);
 	}
