@@ -3,6 +3,9 @@
 var landscape_max_height = 540,
 		uri_login = 'login';
 var gallery, section, total_width, total_height, nb_image_processed;
+var old_url,
+	e_gallery = document.getElementById('gallery'),
+	e_load = e_gallery.querySelectorAll('.load')[0];
 
 /* get obj gallery from json */
 function get_gallery(success) {
@@ -45,7 +48,7 @@ mql.addListener(function(m) {
 /* handle window resize */
 var flag = true;
 window.onresize = function(e) {
-	var e_gallery = document.getElementById('gallery');
+//global	var e_gallery = document.getElementById('gallery');
 	if (e_gallery.offsetWidth > total_width && flag === true && !mql.matches) {
 		add_img_gallery();
 		flag = false;
@@ -74,14 +77,11 @@ function img_resize(img, height, width) {
   return (height != null && width != null) ? img_resize(e_canvas, null, width) : e_canvas;
 }
 
-var old_url;
+
 /* add images to the gallery */
 function generate_gallery(imgz, iterator, preload) {
 	var e_img = document.createElement('div'),
-			e_load = document.getElementById('load'),
-			e_img_attr = document.createAttribute('style'),
-			e_gallery = document.getElementById('gallery');
-				
+			e_img_attr = document.createAttribute('style');
 	if (imgz == undefined || g_gallery == null) return;
 	if (iterator == undefined) {
 		iterator = 0;
@@ -95,8 +95,9 @@ function generate_gallery(imgz, iterator, preload) {
 	}
 
 	//display loader
-	e_load.className = mql.matches && !preload ? 'add' : 'add_inline';
-	
+	e_load.className = e_load.className.replace(/add_inline|add|remove/, '');
+  e_load.className = mql.matches && !preload ? 'add' : 'add_inline';
+
 	var img =  imgz[iterator],
 			n_img = new Image();
 			
@@ -216,10 +217,10 @@ function generate_gallery(imgz, iterator, preload) {
 				}	
 			}
 			
-			if (imgz.length == iterator + 1) {
-				//hide loader
-				e_load.className = 'remove';
-			}
+			// if (imgz.length == iterator + 1) {
+			// 	//hide loader
+			// 	e_load.className = e_load.className.replace(/add_inline|add/, 'remove');
+			// }
 		};
 		n_img.src = img.url;
 	}
@@ -244,8 +245,7 @@ function clear_gallery() {
 			g_gallery.removeChild(all_imgs[all_imgs.length - 1]);
 		}
 	}
-	var e_load = document.getElementById('load');
-	e_load.className = 'remove';
+	e_load.className = e_load.className.replace(/add_inline|add/, 'remove'); //global
 }
 
 /* add section to menu */
