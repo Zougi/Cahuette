@@ -87,6 +87,7 @@ function generate_gallery(imgz, iterator, preload) {
 		total_height = 0;
 		clear_gallery();
 		old_url = [];
+		g_preload = [];
 	}
 	
 	//display loader
