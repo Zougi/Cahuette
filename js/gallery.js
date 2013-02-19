@@ -89,7 +89,6 @@ function generate_gallery(imgz, iterator, preload) {
 		total_height = 0;
 		clear_gallery();
 		old_url = '';
-		g_preload = [];
 	}
 	if (preload == undefined) {
 		preload = false;
@@ -102,7 +101,7 @@ function generate_gallery(imgz, iterator, preload) {
 			n_img = new Image();
 			
 	if (img != undefined && img.url != old_url) {
-		nb_image_processing = iterator + 1;
+		nb_image_processed = iterator + 1;
 		old_url = img.url;
 		n_img.onload = function(event) {
 			
@@ -212,7 +211,7 @@ function generate_gallery(imgz, iterator, preload) {
 			if (imgz.length != iterator + 1) {
 				if (total_size < gallery_size) {
 					generate_gallery(imgz, ++iterator);
-				} else {
+				} else if (g_preload.length) {
 					generate_gallery(imgz, ++iterator, true);
 				}	
 			}
@@ -275,7 +274,7 @@ function add_menu_section(name, e_menu, e_ul) {
 var disable_scroll = false;
 
 //trigger whenever gallery has been fully scrolled to the right
-var g_gallery = document.getElementById('gallery'), g_preload;
+var g_gallery = document.getElementById('gallery'), g_preload = [];
 if (g_gallery != null) {
 	g_gallery.addEventListener('scroll', function() {
 		if ((g_gallery.scrollWidth - g_gallery.offsetWidth <= g_gallery.scrollLeft) && !disable_scroll)
