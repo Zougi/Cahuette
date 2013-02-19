@@ -76,7 +76,7 @@ function img_resize(img, height, width) {
   return (height != null && width != null) ? img_resize(e_canvas, null, width) : e_canvas;
 }
 
-
+var allow_preload = true;
 /* add images to the gallery */
 function generate_gallery(imgz, iterator, preload) {
 	var e_img = document.createElement('div'),
@@ -92,7 +92,7 @@ function generate_gallery(imgz, iterator, preload) {
 	if (preload == undefined) {
 		preload = false;
 	}
-
+	
 	//display loader
 	if (!preload) {
 		e_load.className = e_load.className.replace(/add_inline|add|remove/, '');
@@ -102,7 +102,9 @@ function generate_gallery(imgz, iterator, preload) {
 			n_img = new Image();
 			
 	if (img != undefined && img.url != old_url) {
-		nb_image_processed = iterator + 1;
+		if (!preload) {
+			nb_image_processed = iterator + 1;
+		}
 		old_url = img.url;
 		n_img.onload = function(event) {
 			
@@ -187,8 +189,6 @@ function generate_gallery(imgz, iterator, preload) {
 			} else {
 				if (g_preload.length > 0) {
 					g_gallery.insertBefore(g_preload.shift(), e_load);
-					g_preload.push(e_img);
-					console.log(1);
 				} else {
 					g_gallery.insertBefore(e_img, e_load);
 				}
@@ -207,13 +207,13 @@ function generate_gallery(imgz, iterator, preload) {
 				total_size = total_width;
 				gallery_size = window.innerWidth;
 			}
-			
+
 			// if there is space to fill on the gallery and still images in it: add an image
 			if (imgz.length != iterator + 1) {
 					e_load.className = e_load.className.replace(/add_inline|add/, 'remove');
 				if (total_size < gallery_size) {
 					generate_gallery(imgz, ++iterator);
-				} else if (g_preload.length) {
+				} else if (allow_preload) {
 					generate_gallery(imgz, ++iterator, true);
 				}	
 			} else {
@@ -289,7 +289,7 @@ if (g_gallery != null) {
 function add_img_gallery() {
 	var nb_all_imgs = nb_image_processed || g_gallery.getElementsByClassName('img').length,
 			nb_gallery = gallery[section].length;
-
+	allow_preload = false;
  	if (nb_gallery > nb_all_imgs) {
 		generate_gallery(gallery[section], nb_all_imgs);
 	}
