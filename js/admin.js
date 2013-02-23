@@ -293,11 +293,15 @@ console.log(percentLoaded);
   }
 }
 
+//upload 'files' by packets respecting <limit> 
 function add_images_by_group(callback, api, limit, section, files, done) {
 	api.add_images(section, splice(files, 0, limit), function(reponse) {
 		if (done != undefined) {
 			callback();
 		} else {
+			if (resp.response != "success") {
+				console.log(resp);
+			}
 			if (files.length > limit) {
 				files = splice(files, limit, files.length);
 			} else {
@@ -310,7 +314,11 @@ function add_images_by_group(callback, api, limit, section, files, done) {
 	}, updateProgress);
 }
 
+//reload the gallery when upload is done
 function add_images_callback () {
+	var e_progress = document.querySelectorAll('progress')[0];
+	e_progress.className = e_progress.className.replace(/add|/, 'remove');
+	
 	get_gallery(function(result) {
 		gallery = result;
 		if (g_gallery != null) {
@@ -321,7 +329,8 @@ function add_images_callback () {
 
 function handleFileSelect(event) {
 	var e_progress = document.querySelectorAll('progress')[0];
-	e_progress.className = e_progress.className.replace(/remove/, '');
+	e_progress.className = e_progress.className.replace(/remove/, 'add');
+	e_progress.innerHTML = 'upload in progress...';
 	try {
 		var files = (event.target.files || event.dataTransfer.files || event.originalEvent.dataTransfer.files);
 

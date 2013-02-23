@@ -76,6 +76,7 @@ function img_resize(img, height, width) {
   return (height != null && width != null) ? img_resize(e_canvas, null, width) : e_canvas;
 }
 
+var s_offsetX = 0;
 /* add images to the gallery */
 function generate_gallery(imgz, iterator, preload) {
 	var e_img = document.createElement('div'),
@@ -91,7 +92,7 @@ function generate_gallery(imgz, iterator, preload) {
 	}
 	
 	//display loader
-	if (preload == undefined || preload == false) {
+	if ((preload == undefined || preload == false) && (imgz.length != iterator + 1)) {
 		e_load.className = e_load.className.replace(/add_inline|add|remove/, '');
 	  e_load.className += ' ' + (mql.matches ? 'add' : 'add_inline');	
 	} 
@@ -102,6 +103,13 @@ function generate_gallery(imgz, iterator, preload) {
 		if (preload == undefined || preload == false) {
 			nb_image_processed = iterator + 1;
 		}
+
+		// get saved scroll position
+		var pos, position_string = window.localStorage.getItem('scroll_landscape_' + section);					
+		if (position_string != undefined) {
+			pos = JSON.parse(position_string);
+		}
+		
 		old_url = img.url;
 		n_img.onload = function(event) {
 			
@@ -124,10 +132,11 @@ function generate_gallery(imgz, iterator, preload) {
 
 			//image can be selected to be manipulated if user is admin
 			var btz = null;
-			e_img.addEventListener('click', function(event) {
+			e_img.addEventListener('mouseup', function(event) {
 				var elem = event.target.parentNode,
 						token = localStorage.getItem('token');
-				if (token != undefined && token != null) {
+						
+				if (token != undefined && token != null && (s_offsetX == 0 || s_offsetX == offsetX)) { //double click to select img
 					if (elem.childNodes.length == 1) {
 						elem.appendChild(document.createElement('span'));
 					} else {
@@ -148,6 +157,7 @@ function generate_gallery(imgz, iterator, preload) {
 						del.className += ' remove';
 					}
 				}
+				s_offsetX = offsetX;
 			});
 			
 			//display image fullscreen
@@ -156,7 +166,9 @@ function generate_gallery(imgz, iterator, preload) {
 				old_click_position = event.screenX + '' + event.screenY;
 			});
 			e_img.addEventListener('mouseup', function(event) {
-				if (!mql.matches && (old_click_position == event.screenX + '' + event.screenY)) {
+				var	token = localStorage.getItem('token');
+				if ((token == undefined || token == null)
+						&& !mql.matches && (old_click_position == event.screenX + '' + event.screenY)) {
 					var e_full = document.getElementById('fullscreen');
 					e_full.className = '';
 					e_full.addEventListener('click', function() { //quit fullscreen
@@ -169,10 +181,11 @@ function generate_gallery(imgz, iterator, preload) {
 					
 					var	_n_img = new Image();
 					_n_img.onload = function(event) {
-						var canvas = img_resize(this, window.innerHeight, window.innerWidth);
-						var attr = document.createAttribute('style');
-						attr.nodeValue = 'margin-left: -' + (canvas.width / 2) + 'px;';
-						attr.nodeValue += 'margin-top: ' + ((window.innerHeight - canvas.height) / 2) + 'px;';
+						var canvas = img_resize(this, window.innerHeight, window.innerWidth),
+								attr = document.createAttribute('style'),
+								px_str = 'px;';
+						attr.nodeValue = 'margin-left: -' + (canvas.width / 2) + px_str;
+						attr.nodeValue += 'margin-top: ' + ((window.innerHeight - canvas.height) / 2) + px_str;
 						canvas.setAttributeNode(attr);
 						e_full.appendChild(canvas);
 					};
@@ -184,11 +197,7 @@ function generate_gallery(imgz, iterator, preload) {
 			if (!(preload == undefined || preload == false)) {
 				g_preload.push(e_img);
 			} else {
-				if (g_preload.length > 0) {
-					g_gallery.insertBefore(g_preload.shift(), e_load);
-				} else {
-					g_gallery.insertBefore(e_img, e_load);
-				}
+				g_gallery.insertBefore( ((g_preload.length > 0) ? g_preload.shift() : e_img), e_load);
 			}
 			disable_scroll = false;
 	
@@ -196,6 +205,7 @@ function generate_gallery(imgz, iterator, preload) {
 			total_width += resized_img.width;
 			total_height += resized_img.height;
 
+			// chose side depending on screen orientation
 			var total_size, gallery_size;
 			if (mql.matches) {
 				total_size = total_height;
@@ -204,19 +214,28 @@ function generate_gallery(imgz, iterator, preload) {
 				total_size = total_width;
 				gallery_size = window.innerWidth;
 			}
-
+			
 			// if there is space to fill on the gallery and still images in it: add an image
 			if (imgz.length != iterator + 1) {
-					e_load.className = e_load.className.replace(/add_inline|add/, 'remove');
+				
 				if (total_size < gallery_size) {
 					generate_gallery(imgz, ++iterator);
 				} else if (preload == undefined || preload == true) {
-					generate_gallery(imgz, ++iterator, true);
-				}	
-			} else {
-				//hide loader
-				e_load.className = e_load.className.replace(/add_inline|add/, 'remove');
+					var _preload = true;
+					//restitute previous nb of images ... delay preload
+					if (pos != null && nb_image_processed < pos.nb_img) {
+						_preload = undefined;
+					}
+					generate_gallery(imgz, ++iterator, _preload);
+				}					
 			}
+			
+			//scroll to saved position
+			if (pos != undefined) {
+				g_gallery.scrollLeft = pos.position;
+			}
+			
+			e_load.className = e_load.className.replace(/add_inline|add/, 'remove');
 		};
 		n_img.src = img.url;
 	}
@@ -256,10 +275,11 @@ function add_menu_section(name, e_menu, e_ul) {
 	e_a.setAttributeNode(e_a_attr);
 	
 	e_a.addEventListener('click', function() {
+		section = name;
+		
 		//add section's imgages to gallery
 		generate_gallery(gallery[name]);
-		
-		section = name;
+
 		localStorage.setItem('section', section);
 	});
 	e_li.appendChild(e_a);
@@ -278,6 +298,22 @@ if (g_gallery != null) {
 			disable_scroll = true;
 			add_img_gallery();
 			flag = true;
+		}
+
+		var pos, position_string = window.localStorage.getItem('scroll_landscape_' + section);					
+		if (position_string != undefined) {
+			pos = JSON.parse(position_string);
+		}
+
+		if (pos == undefined || !(nb_image_processed < pos.nb_img)) {
+			//save user's
+			window.localStorage.setItem('scroll_landscape_' + section,
+				JSON.stringify({
+					position: g_gallery.scrollLeft,
+					nb_img: nb_image_processed,
+					time: Date.now()
+				})
+			);
 		}
 	});
 }
@@ -321,7 +357,7 @@ get_gallery(function(result /*, init_admin_panel */ ) {
 			section = (keys.indexOf(section) != -1) ? section : keys[0];
 	}
 	if (g_gallery != null) {
-		generate_gallery(gallery[section]);	
+		generate_gallery(gallery[section]);
 	}
 	if (typeof init_admin_panel == 'function') {
 	  init_admin_panel();
