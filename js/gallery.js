@@ -76,6 +76,25 @@ function img_resize(img, height, width) {
   return (height != null && width != null) ? img_resize(e_canvas, null, width) : e_canvas;
 }
 
+//create button for display_fullscreen_image
+function arrow_button(right, canvas_width, img_url, imgz) {
+	var e_arrow = document.createElement('div'),
+			attr = document.createAttribute('class');
+	attr.nodeValue = 'arrow ' + (right ? 'arrow_right' : 'arrow_left');
+	e_arrow.setAttributeNode(attr);
+	
+	attr = document.createAttribute('style');
+	attr.nodeValue = right ? 'margin-left: ' + ((canvas_width / 2) + arrow_margin) + px_str
+												 : 'margin-left: -' + ((canvas_width / 2) + arrow_width + arrow_margin) + px_str;
+	attr.nodeValue += 'margin-top: ' + ((window.innerHeight - arrow_height) / 2) + px_str;
+	e_arrow.setAttributeNode(attr);
+	
+	e_arrow.addEventListener('click', function() {
+		e_arrow_click(img_url, imgz, right);
+	});
+	return e_arrow;
+}
+
 function display_fullscreen_image(img_url, imgz) {
 		var _n_img = new Image();
 		_n_img.onload = function(event) {
@@ -89,23 +108,10 @@ function display_fullscreen_image(img_url, imgz) {
 			var canvas = img_resize(this, window.innerHeight, window.innerWidth);	
 			
 			//left arrow
-			var e_arrow = document.createElement('div'),
-					attr = document.createAttribute('class');
-			attr.nodeValue = 'arrow arrow_left';
-			e_arrow.setAttributeNode(attr);
-			
-			attr = document.createAttribute('style');
-			attr.nodeValue = 'margin-left: -' + ((canvas.width / 2) + arrow_width + arrow_margin) + px_str;
-			attr.nodeValue += 'margin-top: ' + ((window.innerHeight - arrow_height) / 2) + px_str;
-			e_arrow.setAttributeNode(attr);
-			
-			e_arrow.addEventListener('click', function() {
-				e_arrow_click(img_url, imgz, false);
-			});
-			e_full.appendChild(e_arrow);
+			e_full.appendChild(arrow_button(false, canvas.width, img_url, imgz));
 			
 			//canvas
-			attr = document.createAttribute('style');
+			var attr = document.createAttribute('style');
 			attr.nodeValue = 'margin-left: -' + (canvas.width / 2) + px_str;
 			attr.nodeValue += 'margin-top: ' + ((window.innerHeight - canvas.height) / 2) + px_str;
 			canvas.setAttributeNode(attr);
@@ -117,26 +123,12 @@ function display_fullscreen_image(img_url, imgz) {
 			e_full.appendChild(canvas);
 			
 			//right arrow
-			e_arrow = document.createElement('div');
-			
-			attr = document.createAttribute('class');
-			attr.nodeValue = 'arrow arrow_right';
-			e_arrow.setAttributeNode(attr);
-			
-			attr = document.createAttribute('style');
-			attr.nodeValue = 'margin-left: ' + ((canvas.width / 2) + arrow_margin) + px_str;
-			attr.nodeValue += 'margin-top: ' + ((window.innerHeight - arrow_height) / 2) + px_str;
-			e_arrow.setAttributeNode(attr);
-
-			e_arrow.addEventListener('click', function() {
-				e_arrow_click(img_url, imgz, true);
-			});
-			e_full.appendChild(e_arrow);
+			e_full.appendChild(arrow_button(true, canvas.width, img_url, imgz));
 		};
 		_n_img.src = img_url;
 }
 
-
+//arrows keys can be used to change fullscreen image
 document.addEventListener('keyup', function (event) {
 	if (event.keyCode == 37 /*left arrow key*/ || event.keyCode == 39 /* right */) {
 		var e_img = document.getElementById('fullscreen').getElementsByTagName('canvas')[0];
@@ -145,6 +137,7 @@ document.addEventListener('keyup', function (event) {
 	}
 });
 
+//display next/previous fullscreen image
 function e_arrow_click(img_url, imgz, right) {
 	for (var i = 0; i < imgz.length; i++) {
 		var nxt_img = imgz[right ? i + 1 : i - 1]
@@ -262,12 +255,12 @@ function generate_gallery(imgz, iterator, preload) {
 			//display image fullscreen
 			var old_click_position = '';
 			e_img.addEventListener('mousedown', function(event) {
-				old_click_position = event.screenX + '' + event.screenY;
+				old_click_position = event.screenX + ',' + event.screenY;
 			});
 			e_img.addEventListener('mouseup', function(event) {
 				var	token = localStorage.getItem('token');
 				if ((token == undefined || token == null)
-						&& !mql.matches && (old_click_position == event.screenX + '' + event.screenY)) {
+						&& !mql.matches && (old_click_position == event.screenX + ',' + event.screenY)) {
 							
 					var e_full = document.getElementById('fullscreen');
 					e_full.className = 'add';

@@ -128,6 +128,7 @@ function admin_display() {
 	e_input_u.addEventListener('change', handleFileSelect, false);
 	e_content.appendChild(e_input_u);
 	
+	//progressbar
 	var e_progressbar = document.createElement('progress');
 	
 	attr = document.createAttribute('class');
@@ -144,6 +145,7 @@ function admin_display() {
 	
 	e_content.appendChild(e_progressbar);
 
+	//handle upload by drag and drop
 	var e_gallery = document.getElementById('gallery');
 	e_gallery.addEventListener('dragenter', function() {
 			if (event.target.className == 'img') {
@@ -160,7 +162,7 @@ function admin_display() {
 	});
 	e_gallery.addEventListener('drop', function(event) {
 		event.target.parentNode.style.opacity = 1;
-		handleFileSelect(event);
+		return handleFileSelect(event);
 	});
 	
 	
