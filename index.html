@@ -44,10 +44,19 @@
 	<!-- end logbox --></form>
 	<div id="fullscreen" class="remove"></div>
 </body>
-<script src="js/api.js"></script>
-<script src="js/admin.js"></script>
-<script src="js/gallery.js"></script>
+<script src="js/gallery.min.js"></script>
 <script>
+//gallery component
+gallery({
+	admin: true,
+	fullscreen: true,
+	drag: true,
+	responsive: true,
+	remember_scroll_position: true,
+	min_height: 540,
+	auto_fit: true
+});
+
 //email formater
 (function(d, id) {
   var e = d.getElementById(id),
