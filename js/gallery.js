@@ -856,11 +856,11 @@ function generate_gallery(imgz, iterator, preload) {
 						_preload = undefined;
 					}
 					generate_gallery(imgz, ++iterator, _preload);
-				}					
+				}
 			}
 			
 			//scroll to saved position
-			if (pos != undefined) {
+			if (pos != undefined && !preload) {
 				g_gallery.scrollLeft = pos.position;
 			}
 			
