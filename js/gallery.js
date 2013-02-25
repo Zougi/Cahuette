@@ -718,7 +718,10 @@ function generate_gallery(imgz, iterator, preload) {
 				n_img = new Image();
 			
 	if (img != undefined && old_url.indexOf(img.url) == -1) {
-
+		if ((preload == undefined || preload === false) && (imgz.length != iterator + 1)) {
+			e_load.className = e_load.className.replace(/add_inline|add|remove/, '');
+		  e_load.className += ' ' + (mql.matches ? 'add' : 'add_inline');	
+		}
 		if (preload == undefined || preload === false) {
 			nb_image_processed = iterator + 1;
 		}
@@ -813,7 +816,7 @@ function generate_gallery(imgz, iterator, preload) {
 						} catch (e) {}
 					});
 					
-					display_fullscreen_image(img.url, imgz);
+					display_fullscreen_image('gallery/' + event.target.parentNode.getAttribute('data-src'), imgz);
 				}
 			});
 	
