@@ -105,7 +105,7 @@ function display_fullscreen_image(img_url, imgz) {
 				e_full.removeChild(e_full.firstChild);
 			}
 			
-			var canvas = img_resize(this, window.innerHeight, window.innerWidth);	
+			var canvas = img_resize(this, window.innerHeight, window.innerWidth - ((arrow_width + arrow_margin * 2) * 2));	
 			
 			//left arrow
 			e_full.appendChild(arrow_button(false, canvas.width, img_url, imgz));
@@ -137,6 +137,7 @@ document.addEventListener('keyup', function (event) {
 	}
 });
 
+//prevent gallery scrolling in fullscreen mode
 document.addEventListener('keydown', function (event) {
 	var e_full = document.getElementById('fullscreen');
 	if (e_full.className.indexOf('remove') == -1) {
