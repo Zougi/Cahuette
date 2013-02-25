@@ -515,7 +515,7 @@ function handleFileSelect(event) {
 /* -------------------------- MaxPhotographer - GALLERY -------------------------- */
 
 var landscape_default_height = properties.min_height,
-		uri_login = 'login';
+		uri_login = 'login', stop_loading = false;
 var gallery, section, total_width, total_height, nb_image_processed, old_url;
 var e_gallery = document.getElementById('gallery'),
 		e_load = document.getElementById('load_gallery');
@@ -712,21 +712,23 @@ function generate_gallery(imgz, iterator, preload) {
 		if (preload == undefined || preload === false) {
 			nb_image_processed = iterator + 1;
 		}
-
-		// get saved scroll position
-		var pos, position_string = window.localStorage.getItem('scroll_landscape_' + section);					
-		if (properties.remember_scroll_position && position_string != undefined) {
-			console.log(position_string);
-			pos = JSON.parse(position_string);
-		}
-		
-		//delete cookie if it's been 1 hours you disconnected
-		if (pos != undefined && pos.time + 3600000 < Date.now()) {
-			window.localStorage.removeItem('scroll_landscape_' + section);
-		}
 		
 		old_url = img.url;
 		n_img.onload = function(event) {
+			if (stop_loading) {
+				stop_loading = false;
+				return;
+			}
+			// get saved scroll position
+			var pos, position_string = window.localStorage.getItem('scroll_landscape_' + section);					
+			if (properties.remember_scroll_position && position_string != undefined) {
+				pos = JSON.parse(position_string);
+			}
+
+			//delete cookie if it's been 1 hours you disconnected
+			if (pos != undefined && pos.time + 3600000 < Date.now()) {
+				window.localStorage.removeItem('scroll_landscape_' + section);
+			}
 			
 			//add infos to image
 			var e_img_attr = document.createAttribute('data-src');
@@ -809,7 +811,22 @@ function generate_gallery(imgz, iterator, preload) {
 			if (!(preload == undefined || preload === false)) {
 				g_preload.push(e_img);
 			} else {
-				g_gallery.insertBefore( ((g_preload.length > 0) ? g_preload.shift() : e_img), e_load);
+				var img = (g_preload.length > 0) ? g_preload.shift() : e_img;
+				function img_inNodeList(n, list) {
+					for (var i = 0; i < list.length; i++) {
+						console.log(list[i].getAttribute('data-src'));
+						console.log(src);
+						if (list[i].getAttribute('data-src') == n) {
+							console.log(true);
+							return 0;
+						}
+					}
+					return -1;
+				}
+				var src = this.src.substr(this.src.lastIndexOf('/') + 1);
+				if (img_inNodeList(src, document.querySelectorAll('.img')) == -1) {
+						g_gallery.insertBefore(img, e_load);
+				}
 			}
 			disable_scroll = false;
 	
@@ -888,7 +905,7 @@ function add_menu_section(name, e_menu, e_ul) {
 	
 	e_a.addEventListener('click', function() {
 		section = name;
-		
+
 		//add section's imgages to gallery
 		generate_gallery(gallery[name]);
 
