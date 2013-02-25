@@ -657,6 +657,16 @@ document.addEventListener('keydown', function (event) {
 	}
 });
 
+//return -1 if the image is in the gallery, 0 otherwise
+function img_inNodeList(n, list) {
+	for (var i = 0; i < list.length; i++) {
+		if (list[i].getAttribute('data-src') == n) {
+			return 0;
+		}
+	}
+	return -1;
+}
+
 //display next/previous fullscreen image
 function e_arrow_click(img_url, imgz, right) {
 	for (var i = 0; i < imgz.length; i++) {
@@ -812,17 +822,7 @@ function generate_gallery(imgz, iterator, preload) {
 				g_preload.push(e_img);
 			} else {
 				var img = (g_preload.length > 0) ? g_preload.shift() : e_img;
-				function img_inNodeList(n, list) {
-					for (var i = 0; i < list.length; i++) {
-						console.log(list[i].getAttribute('data-src'));
-						console.log(src);
-						if (list[i].getAttribute('data-src') == n) {
-							console.log(true);
-							return 0;
-						}
-					}
-					return -1;
-				}
+
 				var src = this.src.substr(this.src.lastIndexOf('/') + 1);
 				if (img_inNodeList(src, document.querySelectorAll('.img')) == -1) {
 						g_gallery.insertBefore(img, e_load);
