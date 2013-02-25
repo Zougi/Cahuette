@@ -311,3 +311,29 @@ footer > a {
 	background: url('loader.gif') center no-repeat;
 }
 
+#fullscreen > .arrow {
+	position: absolute;
+	left: 50%;
+	width: 0; 
+	height: 0; 
+	border-top: 90px solid transparent;
+	border-bottom: 90px solid transparent;
+	cursor:pointer;
+}
+
+
+#fullscreen > .arrow_right {
+	border-left: 60px solid rgba(255, 255, 255, 0.4);
+}
+
+#fullscreen > .arrow_right:hover {
+		border-left: 60px solid rgba(255, 255, 255, 0.8);
+}
+
+#fullscreen > .arrow_left {
+	border-right: 60px solid rgba(255, 255, 255, 0.4);
+}
+
+#fullscreen > .arrow_left:hover {
+		border-right: 60px solid rgba(255, 255, 255, 0.8);
+}
