@@ -137,6 +137,13 @@ document.addEventListener('keyup', function (event) {
 	}
 });
 
+document.addEventListener('keydown', function (event) {
+	var e_full = document.getElementById('fullscreen');
+	if (e_full.className.indexOf('remove') == -1) {
+		event.preventDefault ? event.preventDefault() : event.returnValue = false;
+	}
+});
+
 //display next/previous fullscreen image
 function e_arrow_click(img_url, imgz, right) {
 	for (var i = 0; i < imgz.length; i++) {
