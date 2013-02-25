@@ -313,6 +313,16 @@ function admin_display() {
 		var api = new API();
 		api.rm_images(section, urlz, function(response) {
 			if (response.error == undefined) {
+				var pos, position_string = window.localStorage.getItem('scroll_landscape_' + section);					
+				if (properties.remember_scroll_position && position_string != undefined) {
+					pos = JSON.parse(position_string);
+				}
+				if (pos != undefined) {
+					while (pos.nb_img > nb_image_processed - urlz.length) {
+						pos.nb_img = pos.nb_img - 1;
+					} 
+					window.localStorage.setItem('scroll_landscape_' + section, pos);
+				}
 				window.location.reload(true);
 			}
 		})
@@ -706,7 +716,13 @@ function generate_gallery(imgz, iterator, preload) {
 		// get saved scroll position
 		var pos, position_string = window.localStorage.getItem('scroll_landscape_' + section);					
 		if (properties.remember_scroll_position && position_string != undefined) {
+			console.log(position_string);
 			pos = JSON.parse(position_string);
+		}
+		
+		//delete cookie if it's been 1 hours you disconnected
+		if (pos != undefined && pos.time + 3600000 < Date.now()) {
+			window.localStorage.removeItem('scroll_landscape_' + section);
 		}
 		
 		old_url = img.url;
@@ -901,7 +917,7 @@ if (g_gallery != null) {
 			pos = JSON.parse(position_string);
 		}
 
-		if (properties.remember_scroll_position && (pos == undefined || !(nb_image_processed < pos.nb_img) || pos.nb_img < g_gallery.getElementsByClassName('img').length)) {
+		if (properties.remember_scroll_position && (pos == undefined || !(nb_image_processed < pos.nb_img))) {
 			//save user's
 			window.localStorage.setItem('scroll_landscape_' + section,
 				JSON.stringify({
