@@ -287,19 +287,20 @@ footer > a {
 	z-index: 2;
 }
 
-#fullscreen > canvas {
+#fullscreen > * {
 	position: absolute;
-/*	top: 50%; */
 	left: 50%;
 	text-align: center;
 }
 
 #fullscreen > .load {
+	z-index: 1;
+	margin-left: -50px;
+	-webkit-filter: invert(100%);
 	display: none;
 	white-space: normal;
 	width: 100px;
 	height: 540px;
-	margin: 0;
 	vertical-align: middle;
 }
 
@@ -312,15 +313,12 @@ footer > a {
 }
 
 #fullscreen > .arrow {
-	position: absolute;
-	left: 50%;
 	width: 0; 
 	height: 0; 
 	border-top: 90px solid transparent;
 	border-bottom: 90px solid transparent;
 	cursor:pointer;
 }
-
 
 #fullscreen > .arrow_right {
 	border-left: 60px solid rgba(255, 255, 255, 0.4);

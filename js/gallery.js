@@ -613,14 +613,16 @@ function display_fullscreen_image(img_url, imgz) {
 			var e_full = document.getElementById('fullscreen');
 		
 			//delete previous image
-			while (e_full.firstChild) {
+			while (e_full.firstChild && (e_full.firstChild.className == undefined || e_full.firstChild.className.indexOf('load') == -1)) {
 				e_full.removeChild(e_full.firstChild);
 			}
+			var e_loadf = e_full.getElementsByClassName('load')[0];
+			e_loadf.className = e_loadf.className.replace(/add|add_inline/, 'remove');
 			
 			var canvas = img_resize(this, window.innerHeight, window.innerWidth - ((arrow_width + arrow_margin * 2) * 2));	
 			
 			//left arrow
-			e_full.appendChild(arrow_button(false, canvas.width, img_url, imgz));
+			e_full.insertBefore(arrow_button(false, canvas.width, img_url, imgz), e_full.firstChild);
 			
 			//canvas
 			var attr = document.createAttribute('style');
@@ -632,10 +634,10 @@ function display_fullscreen_image(img_url, imgz) {
 			e_img_attr.nodeValue = this.src.substr(this.src.lastIndexOf('/') + 1);
 			canvas.setAttributeNode(e_img_attr);
 			
-			e_full.appendChild(canvas);
+			e_full.insertBefore(canvas, e_full.firstChild);
 			
 			//right arrow
-			e_full.appendChild(arrow_button(true, canvas.width, img_url, imgz));
+			e_full.insertBefore(arrow_button(true, canvas.width, img_url, imgz), e_full.firstChild);
 		};
 		_n_img.src = img_url;
 }
@@ -670,8 +672,11 @@ function img_inNodeList(n, list) {
 //display next/previous fullscreen image
 function e_arrow_click(img_url, imgz, right) {
 	for (var i = 0; i < imgz.length; i++) {
-		var nxt_img = imgz[right ? i + 1 : i - 1]
-		if (imgz[i].url == img_url && nxt_img != undefined) {
+		var nxt_img = imgz[right ? i + 1 : i - 1];
+		if (imgz[i].url == img_url) {
+			if (nxt_img == undefined) {
+				nxt_img = right ? imgz[0] : imgz[imgz.length - 1];
+			}
 			//reload fullscreen with new image
 			display_fullscreen_image(nxt_img.url, imgz);
 			
@@ -756,7 +761,9 @@ function generate_gallery(imgz, iterator, preload) {
 			var resized_img = (
 				mql.matches
 				? img_resize(event.target, null, window.innerWidth)
-				: img_resize(event.target,  (window.innerHeight > landscape_default_height && properties.auto_fit) ? window.innerHeight * 0.8 : landscape_default_height)
+				: img_resize(event.target,  (window.innerHeight > landscape_default_height && properties.auto_fit)
+																					? (window.innerHeight * 0.8 < landscape_default_height ? landscape_default_height : window.innerHeight * 0.8)
+																					: landscape_default_height)
 			);
 			e_img.appendChild(resized_img);
 
@@ -809,11 +816,8 @@ function generate_gallery(imgz, iterator, preload) {
 							return false;
 						}
 						this.className = 'remove';
-						try {
-							while (this.firstChild) {
-								this.removeChild(this.firstChild);
-							}
-						} catch (e) {}
+						var e_loadf = e_full.getElementsByClassName('load')[0];
+						e_loadf.className = e_loadf.className.replace(/remove/, 'add');
 					});
 					
 					display_fullscreen_image('gallery/' + event.target.parentNode.getAttribute('data-src'), imgz);
