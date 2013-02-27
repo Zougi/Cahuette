@@ -7,6 +7,7 @@ var properties = {
 	responsive: true,
 	remember_scroll_position: true,
 	min_height: 540,
+	max_height: 0,
 	auto_fit: true
 };
 if (arguments[0] != undefined && typeof arguments[0] == 'object') {
@@ -588,7 +589,7 @@ function img_resize(img, height, width) {
   return (height != null && width != null) ? img_resize(e_canvas, null, width) : e_canvas;
 }
 
-//create button for display_fullscreen_image
+//create a button arrow (for display_fullscreen_image)
 function arrow_button(right, canvas_width, img_url, imgz) {
 	var e_arrow = document.createElement('div'),
 			attr = document.createAttribute('class');
@@ -671,24 +672,47 @@ function img_inNodeList(n, list) {
 
 //display next/previous fullscreen image
 function e_arrow_click(img_url, imgz, right) {
+	var scrollreset,
+			iterator_direction = -1;
+	if (right) {
+		iterator_direction = 1;
+	}
+	var e_imgz = document.querySelectorAll('.img');
+	
 	for (var i = 0; i < imgz.length; i++) {
-		var nxt_img = imgz[right ? i + 1 : i - 1];
+		var nxt_img = imgz[i + iterator_direction];
 		if (imgz[i].url == img_url) {
+			
+			//loop fullscreen display: reset gallery to position 0 when user click on arrow and there is no next image
+			//													& last position when their is no previous image
 			if (nxt_img == undefined) {
-				nxt_img = right ? imgz[0] : imgz[imgz.length - 1];
+				if (right) {
+					nxt_img = imgz[0];
+					scrollreset = 0;
+				} else {
+					nxt_img = imgz[imgz.length - 1];
+					scrollreset = 0;
+					for (var i = 0; i < e_imgz.length; i++) {
+						scrollreset += e_imgz[i].firstChild.width;
+					}
+				}
 			}
 			//reload fullscreen with new image
 			display_fullscreen_image(nxt_img.url, imgz);
 			
-			//move g_gallery
-			var e_imgz = document.querySelectorAll('.img');
+			//auto scroll g_gallery
 			for (var i = 0; i < e_imgz.length; i++) {
 				if ('gallery/' + e_imgz[i].getAttribute('data-src') == img_url) {
-					if (right) {
-						g_gallery.scrollLeft += e_imgz[i].firstChild.width;
+					if (scrollreset != undefined) {
+						g_gallery.scrollLeft = scrollreset;
 					} else {
-						g_gallery.scrollLeft -= e_imgz[i].firstChild.width;
+						if (right) {
+							g_gallery.scrollLeft += e_imgz[i].firstChild.width;
+						} else {
+							g_gallery.scrollLeft -= e_imgz[i].firstChild.width;
+						}
 					}
+					break;
 				}
 			}
 			break;
@@ -762,7 +786,9 @@ function generate_gallery(imgz, iterator, preload) {
 				mql.matches
 				? img_resize(event.target, null, window.innerWidth)
 				: img_resize(event.target,  (window.innerHeight > landscape_default_height && properties.auto_fit)
-																					? (window.innerHeight * 0.8 < landscape_default_height ? landscape_default_height : window.innerHeight * 0.8)
+																					? (properties.max_height == 0 || properties.max_height > window.innerHeight * 0.8)
+																															? window.innerHeight * 0.8
+																															: properties.max_height
 																					: landscape_default_height)
 			);
 			e_img.appendChild(resized_img);
@@ -812,7 +838,7 @@ function generate_gallery(imgz, iterator, preload) {
 					e_full.className = 'add';
 					
 					e_full.addEventListener('click', function(event) { //quit fullscreen
-						if (event.target.className.indexOf('arrow') != -1) {
+						if (event.target.className.indexOf('arrow') != -1) { //we verify the user didn't clicked on an arrow
 							return false;
 						}
 						this.className = 'remove';
