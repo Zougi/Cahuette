@@ -296,7 +296,7 @@ footer > a {
 #fullscreen > .load {
 	z-index: 1;
 	margin-left: -50px;
-	-webkit-filter: invert(100%);
+	filter: invert(100%);
 	display: none;
 	white-space: normal;
 	width: 100px;

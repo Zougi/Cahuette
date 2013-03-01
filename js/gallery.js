@@ -1,3 +1,4 @@
+/* -------------------------- MaxPhotographer - Default Properties -------------------------- */
 var gallery = (function () {
 
 var properties = {
@@ -20,6 +21,91 @@ if (arguments[0] != undefined && typeof arguments[0] == 'object') {
 		}
 	}
 }
+
+/* -------------------------- MaxPhotographer - Generate Base html tags -------------------------- */
+
+//attach attrz object as attributes to elem. Note: class attribute has to be named classs
+function attach_attribute(elem, attrz) {
+	var attr;
+	for (var a in attrz) {
+		attr = document.createAttribute(a == 'classs' ? 'class' : a);
+		if (attrz[a] != undefined) {
+			attr.nodeValue = attrz[a];
+		}
+		elem.setAttributeNode(attr);
+	}
+	return elem;
+}
+
+//add essential tags to html dom
+(function () {
+var fragment = document.createDocumentFragment();
+
+// <form id="logbox" class="remove">
+//   <fieldset>
+//     <legend>Administration</legend>
+// 		<input id="login" type="text" name="login" placeholder="Login"/>
+// 		<input id="password" type="password" name="password" placeholder="Password" />
+// 		<button id="connect">Login</button>
+// 	</fieldset>
+// 	<button id="close">X</button>
+// <!-- end logbox --></form>
+var logbox = fragment.appendChild(attach_attribute(document.createElement('form'), {id:'logbox', classs:'remove'}));
+var fieldset = logbox.appendChild(document.createElement('fieldset'));
+var legend = fieldset.appendChild(document.createElement('legend'));
+legend.appendChild(document.createTextNode('Administration'));
+
+var input = attach_attribute(document.createElement('input'), {id: 'login', type: 'text', name: 'login', placeholder: 'Login'});
+fieldset.appendChild(input);
+
+input = attach_attribute(document.createElement('input'), {id: 'password', type: 'password', name: 'password', placeholder: 'Password'});
+fieldset.appendChild(input);
+
+var button = attach_attribute(document.createElement('button'), {id: 'connect'});
+button.appendChild(document.createTextNode('Login'));
+fieldset.appendChild(button);
+
+button = attach_attribute(document.createElement('button'), {id: 'close'});
+button.appendChild(document.createTextNode('X'));
+
+logbox.appendChild(button);
+
+// <div id="fullscreen" class="remove">
+// 	<div id="load_fullscreen" class="load add">
+// 		<div></div>
+// 	<!-- end load --></div>
+// <!-- end fullscreen --></div>
+
+var fullscreen = fragment.appendChild(attach_attribute(document.createElement('div'), {id: 'fullscreen', classs: 'remove'}));
+var load_fullscreen = fullscreen.appendChild(attach_attribute(document.createElement('div'), {id: 'load_fullscreen', classs: 'load add'}));
+load_fullscreen.appendChild(document.createElement('div'));
+
+document.body.appendChild(fragment);
+
+//<ul></ul> => menu
+var menu = document.getElementById('menu');
+if (menu != undefined) {
+	menu.appendChild(document.createElement('ul'));
+} else {
+	console.log('menu not found: a div with id \'menu\' should be declared');
+}
+
+// <div id="load_gallery" class="load">
+// 	<div></div>
+// <!-- end load_gallery --></div>
+// <div style="clear:both;"></div>
+// => gallery
+var gallery = document.getElementById('gallery');
+if (gallery != undefined) {
+	fragment = document.createDocumentFragment();
+	var load_gallery = fragment.appendChild(attach_attribute(document.createElement('div'), {id:'load_gallery', classs:'load'}));
+	load_gallery.appendChild(document.createElement('div'));
+	fragment.appendChild(attach_attribute(document.createElement('div'), {style:'clear:both;'}));
+	gallery.appendChild(fragment);
+} else {
+	console.log('gallery not found: a div with id \'gallery\' should be declared');
+}
+})();
 
 /* -------------------------- MaxPhotographer - API -------------------------- */
 
@@ -242,44 +328,45 @@ function admin_display() {
 	e_menu.appendChild(e_bt);
 	
 	//upload files
-	var e_input_u = document.createElement('input');
-	
-	attr = document.createAttribute('type');
-	attr.nodeValue = 'file';
-	e_input_u.setAttributeNode(attr);
-	
-	attr = document.createAttribute('name');
-	attr.nodeValue = 'imgz';
-	e_input_u.setAttributeNode(attr);
-	
-	attr = document.createAttribute('multiple');
-	e_input_u.setAttributeNode(attr);
-	
-	attr = document.createAttribute('class');
-	var val = 'bt_upload';
+	// var e_input_u = document.createElement('input');
+	// 
+	// attr = document.createAttribute('type');
+	// attr.nodeValue = 'file';
+	// e_input_u.setAttributeNode(attr);
+	// 
+	// attr = document.createAttribute('name');
+	// attr.nodeValue = 'imgz';
+	// e_input_u.setAttributeNode(attr);
+	// 
+	// attr = document.createAttribute('multiple');
+	// e_input_u.setAttributeNode(attr);
+	// 
+	// attr = document.createAttribute('class');
+	var classs = 'bt_upload';
 	if (ez_li.length == 0) {
-		val += ' remove';
+		classs += ' remove';
 	}
-	attr.nodeValue = val;
-	e_input_u.setAttributeNode(attr);
+	// attr.nodeValue = val;
+	// e_input_u.setAttributeNode(attr);
+	var e_input_u = attach_attribute(document.createElement('input'), {type: 'file', name: 'imgz', multiple: undefined, classs: classs});
 	e_input_u.addEventListener('change', handleFileSelect, false);
 	e_content.appendChild(e_input_u);
 	
 	//progressbar
-	var e_progressbar = document.createElement('progress');
-	
-	attr = document.createAttribute('class');
-	attr.nodeValue = 'remove';
-	e_progressbar.setAttributeNode(attr);
-
-	attr = document.createAttribute('value');
-	attr.nodeValue = 0;
-	e_progressbar.setAttributeNode(attr);
-
-	attr = document.createAttribute('max');
-	attr.nodeValue = 100;
-	e_progressbar.setAttributeNode(attr);
-	
+	// var e_progressbar = document.createElement('progress');
+	// 
+	// attr = document.createAttribute('class');
+	// attr.nodeValue = 'remove';
+	// e_progressbar.setAttributeNode(attr);
+	// 
+	// attr = document.createAttribute('value');
+	// attr.nodeValue = 0;
+	// e_progressbar.setAttributeNode(attr);
+	// 
+	// attr = document.createAttribute('max');
+	// attr.nodeValue = 100;
+	// e_progressbar.setAttributeNode(attr);
+	var e_progressbar = attach_attribute(document.createElement('progress'), {classs: 'remove', value: '0', max: '100' });
 	e_content.appendChild(e_progressbar);
 
 	//handle upload by drag and drop
@@ -437,7 +524,7 @@ function updateProgress(evt) {
 		}
 console.log(percentLoaded);
     if (percentLoaded < 100) {
-      e_progress.setAttribute('value', percentLoaded + '%');
+      e_progress.setAttributeNode('value', percentLoaded + '%');
       e_progress.textContent = percentLoaded + '%';
     }
   }
@@ -650,6 +737,13 @@ document.addEventListener('keyup', function (event) {
 		var img_url = 'gallery/' + e_img.getAttribute('data-src');
 		e_arrow_click(img_url, gallery[section], (event.keyCode == 39))
 	}
+	if (event.keyCode == 27 /* Esc key */) {
+		var e_full = document.getElementById('fullscreen');
+		e_full.className = 'remove';
+		
+		var e_loadf = e_full.getElementsByClassName('load')[0];
+		e_loadf.className = e_loadf.className.replace(/remove/, 'add');
+	}
 });
 
 //prevent gallery scrolling in fullscreen mode
@@ -743,14 +837,11 @@ function generate_gallery(imgz, iterator, preload) {
 		e_load.className = e_load.className.replace(/add_inline|add|remove/, '');
 	  e_load.className += ' ' + (mql.matches ? 'add' : 'add_inline');	
 	} 
-		var img =  imgz[iterator],
-				n_img = new Image();
+	var img =  imgz[iterator],
+			n_img = new Image();
 			
 	if (img != undefined && old_url.indexOf(img.url) == -1) {
-		if ((preload == undefined || preload === false) && (imgz.length != iterator + 1)) {
-			e_load.className = e_load.className.replace(/add_inline|add|remove/, '');
-		  e_load.className += ' ' + (mql.matches ? 'add' : 'add_inline');	
-		}
+
 		if (preload == undefined || preload === false) {
 			nb_image_processed = iterator + 1;
 		}
@@ -1042,7 +1133,7 @@ if (properties.drag && g_gallery != null) {
 
 	g_gallery.onmousemove = function(event) {
 		if (dragged) {
-			g_gallery.scrollLeft = g_gallery.scrollLeft - (event.screenX - offsetX) / 7; //the division slows the slide by cursor
+			g_gallery.scrollLeft = g_gallery.scrollLeft - (event.screenX - offsetX); // here we can divide the result to slow the slide by cursor
 		}
 	} 
      
