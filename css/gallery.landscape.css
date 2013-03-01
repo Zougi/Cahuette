@@ -1,0 +1,189 @@
+/* MaxPhotographer - gallery.landscape.css */
+
+/* gallery */
+#gallery > .load {
+	display: none;
+	white-space: normal;
+	width: 100px;
+	height: 540px;
+	margin: 0;
+	vertical-align: middle;
+}
+
+#gallery > .load > div {
+	position: relative;
+	width: 100px;
+	height: 100px;
+	margin-top: 220px;
+	background: url('loader.gif') center no-repeat;
+}
+
+#gallery {
+	cursor: pointer;
+	overflow-y: hidden;
+	overflow-x: scroll;
+	width: auto;
+	margin-top: 13px;
+	white-space: nowrap;
+	min-height: 460px;
+}
+
+#gallery > .img {
+	overflow-y: hidden;
+	display: inline-block;
+	white-space: normal;
+	margin-right: 7px;
+	position: relative;
+	vertical-align: middle;
+}
+
+#gallery >:first-child {
+	margin-left: 7px !important;
+}
+
+#gallery > .img > span {
+	border: 5px dashed black;
+	position: absolute;
+	top: 0;
+	display: block;
+	left: 0;
+	bottom: 0;
+	right: 0;
+}
+
+#gallery::-webkit-scrollbar {
+	-webkit-appearance: none;
+	width: 11px;
+	height: 11px;
+}
+
+#gallery::-webkit-scrollbar-thumb {
+	border-radius: 8px;
+	border: 2px solid white; /* should match background, can't be transparent */
+	background-color: rgba(0, 0, 0, .5);
+}
+
+/* fullscreen */
+#fullscreen {
+	position: fixed;
+	right: 0;
+	left: 0;
+	top: 0;
+	bottom: 0;
+	background: rgba(0, 0, 0, 0.7);
+	z-index: 2;
+}
+
+#fullscreen > * {
+	position: absolute;
+	left: 50%;
+	text-align: center;
+}
+
+#fullscreen > .load {
+	z-index: 1;
+	margin-left: -50px;
+	filter: invert(100%);
+	display: none;
+	white-space: normal;
+	width: 100px;
+	height: 540px;
+	vertical-align: middle;
+}
+
+#fullscreen > .load > div {
+	position: relative;
+	width: 100px;
+	height: 100px;
+	margin-top: 220px;
+	background: url('loader.gif') center no-repeat;
+}
+
+#fullscreen > .arrow {
+	width: 0; 
+	height: 0; 
+	border-top: 90px solid transparent;
+	border-bottom: 90px solid transparent;
+	cursor:pointer;
+}
+
+#fullscreen > .arrow_right {
+	border-left: 60px solid rgba(255, 255, 255, 0.4);
+}
+
+#fullscreen > .arrow_right:hover {
+		border-left: 60px solid rgba(255, 255, 255, 0.8);
+}
+
+#fullscreen > .arrow_left {
+	border-right: 60px solid rgba(255, 255, 255, 0.4);
+}
+
+#fullscreen > .arrow_left:hover {
+		border-right: 60px solid rgba(255, 255, 255, 0.8);
+}
+
+
+/* logbox */
+#logbox {
+	position: absolute;
+	width: 200px;
+	height: 100px;
+	top: 40%;
+	left: 40%;
+	text-align: center;
+	background: rgba(0,0,0,0.4);
+	color: #C9C9C9;
+	padding-bottom: 20px;
+}
+
+#logbox > fieldset {
+	border: 1px dashed #000;
+}
+
+#logbox > fieldset > legend {
+	text-align: left;
+}
+
+#logbox > fieldset >:nth-child(3) {
+	margin-top: 10px;
+}
+
+#logbox > fieldset >:last-child {
+	margin-top: 10px;
+	background: none;
+	color: #C9C9C9;
+}
+
+#logbox > button {
+	position: absolute;
+	top: 0;
+	color: #C9C9C9;
+	right: 0;
+	background: none;
+}
+
+/* admin */
+.remove {
+	display: none !important;
+}
+
+.add {
+	display: block !important;
+}
+
+.add_inline {
+	display: inline-block !important;
+}
+
+.bt_upload, .bt_up, .bt_down {
+	display: inline-block;
+	color: #000;
+	float: left;
+}
+
+.bt_up, .bt_down {
+	display: none;
+	width: 66px;
+	margin-left: 10px;
+}
