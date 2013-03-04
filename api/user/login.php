@@ -3,8 +3,8 @@ require '../lib.php';
 header('Content-type: application/json');
 session_start();
 
-$def_login = 'max';
-$def_password = 'maxime';
+$def_login = 'login';
+$def_password = 'password';
 
 if (isset($_GET['login']) && isset($_GET['password'])
 		&& $_GET['login'] == $def_login && $_GET['password'] == $def_password) {

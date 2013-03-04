@@ -2,15 +2,59 @@
 var gallery = (function () {
 
 var properties = {
-	admin: true,
-	fullscreen: true,
-	drag: true,
-	responsive: true,
-	remember_scroll_position: true,
-	min_height: 540,
-	max_height: 0,
-	auto_fit: true
+	admin: true, //enable the admin interface
+	fullscreen: true, //tap on an image to display it fullscreen
+	drag: true, //allow user to scroll the gallery by dragging the images
+	responsive: true, //activate smartphone view (portrait)
+	remember_scroll_position: true, //reset the scroll position after page reload or switch of section 
+	min_height: 540, //minimum height of the gallery container
+	max_height: 0, //if defined, set a maximum resizement height for gallery container. (auto_fit must be enabled)
+	auto_fit: true, //autofit option is enabled max_height = window.innerHeight
+	uri_api: 'api/', //default url of the api is 'api/'
+	uri_storage: 'storage/gallery.json'//default url to get the images datas is 'storage/gallery.json'
 };
+
+//messages text
+var lang = {
+	logbox: {
+		title: 'Administration',
+		login: 'Login',
+		password: 'Password'
+	},
+	confirm_remove: 'remove',
+	new_category: 'New Category',
+	error: {
+		new_category: "Supply a category name"
+	},
+	warning: {
+		before_add: 'The new section will be saved after you added one image or more',
+		no_tag_menu: 'menu not found: a div with id \'menu\' should be declared'
+	},
+	error: {
+		no_tag_gallery: 'gallery not found: a div with id \'gallery\' should be declared',
+		login: 'error: login/password incorrect',
+		api: 'error: problem api',
+		not_images: 'Files must be images'
+	}
+};
+
+//event definition: mouse/touch
+var event_str = ('ontouchstart' in document) ? {
+	click: 'touchstart',
+	start: 'touchstart',
+	end: 'touchend',
+	hover: null
+} : {
+	click: 'click',
+	start: 'mouseup',
+	end: 'mousedown',
+	hover: {
+		start: 'mouseenter',
+		end: 'mouseleave'
+	}
+};
+
+//fill default properties with passed ones
 if (arguments[0] != undefined && typeof arguments[0] == 'object') {
 	for (var i in properties) {
 		for (var j in arguments[0]) {
@@ -50,15 +94,16 @@ var fragment = document.createDocumentFragment();
 // 	</fieldset>
 // 	<button id="close">X</button>
 // <!-- end logbox --></form>
+// => logbox
 var logbox = fragment.appendChild(attach_attribute(document.createElement('form'), {id:'logbox', classs:'remove'}));
 var fieldset = logbox.appendChild(document.createElement('fieldset'));
 var legend = fieldset.appendChild(document.createElement('legend'));
-legend.appendChild(document.createTextNode('Administration'));
+legend.appendChild(document.createTextNode(lang.logbox_title));
 
-var input = attach_attribute(document.createElement('input'), {id: 'login', type: 'text', name: 'login', placeholder: 'Login'});
+var input = attach_attribute(document.createElement('input'), {id: 'login', type: 'text', name: 'login', placeholder: lang.logbox.login});
 fieldset.appendChild(input);
 
-input = attach_attribute(document.createElement('input'), {id: 'password', type: 'password', name: 'password', placeholder: 'Password'});
+input = attach_attribute(document.createElement('input'), {id: 'password', type: 'password', name: 'password', placeholder: lang.logbox.password});
 fieldset.appendChild(input);
 
 var button = attach_attribute(document.createElement('button'), {id: 'connect'});
@@ -75,7 +120,7 @@ logbox.appendChild(button);
 // 		<div></div>
 // 	<!-- end load --></div>
 // <!-- end fullscreen --></div>
-
+// => fullscreen
 var fullscreen = fragment.appendChild(attach_attribute(document.createElement('div'), {id: 'fullscreen', classs: 'remove'}));
 var load_fullscreen = fullscreen.appendChild(attach_attribute(document.createElement('div'), {id: 'load_fullscreen', classs: 'load add'}));
 load_fullscreen.appendChild(document.createElement('div'));
@@ -87,7 +132,7 @@ var menu = document.getElementById('menu');
 if (menu != undefined) {
 	menu.appendChild(document.createElement('ul'));
 } else {
-	console.log('menu not found: a div with id \'menu\' should be declared');
+	console.log(lang.warning.no_menu);
 }
 
 // <div id="load_gallery" class="load">
@@ -103,7 +148,7 @@ if (gallery != undefined) {
 	fragment.appendChild(attach_attribute(document.createElement('div'), {style:'clear:both;'}));
 	gallery.appendChild(fragment);
 } else {
-	console.log('gallery not found: a div with id \'gallery\' should be declared');
+	console.log(lang.error.no_tag_gallery);
 }
 })();
 
@@ -111,7 +156,7 @@ if (gallery != undefined) {
 
 var API = function() {}
 
-API.uri = function() { return 'api/'; };
+API.uri = function() { return properties.uri_api; };
 
 API.http_request = function(method, url, data, callback, progress) {
 	var xhr = new XMLHttpRequest();
@@ -252,10 +297,10 @@ function admin_display() {
 	for (var i = 0; i < ez_li.length; i++) {
 		e_bt = document.createElement('button');
 		e_bt.appendChild(document.createTextNode('x'));
-		e_bt.addEventListener('click', function(event) {
+		e_bt.addEventListener(event_str.click, function(event) {
 			var e_li = event.target.parentNode;
 			var section_name = e_li.getElementsByTagName('a')[0].innerHTML;
-			if (confirm('remove ' + section_name + ' ?')) {
+			if (confirm(lang.confirm_remove + ' ' + section_name + ' ?')) {
 				var api = new API();
 				api.rm_section(section_name, function(response) {
 					if (section_name == section) {
@@ -278,14 +323,14 @@ function admin_display() {
 	//add section
 	var e_input = document.createElement('input')
 	attr = document.createAttribute('placeholder');
-	attr.nodeValue = 'New Categorie';
+	attr.nodeValue = lang.new_category;
 	e_input.setAttributeNode(attr);
 	e_menu.appendChild(e_input);
 
 	e_bt = document.createElement('button');
-	e_bt.addEventListener('click', function(event) {
+	e_bt.addEventListener(event_str.click, function(event) {
 		if (e_input.value == '') {
-			alert("Supply a category name");
+			alert(lang.error.new_category);
 			return;
 		}
 		
@@ -293,10 +338,10 @@ function admin_display() {
 		
 		e_bt = document.createElement('button');
 		e_bt.appendChild(document.createTextNode('x'));
-		e_bt.addEventListener('click', function(event) {	
+		e_bt.addEventListener(event_str.click, function(event) {	
 			var e_li = event.target.parentNode;
 			var section_name = e_li.getElementsByTagName('a')[0].innerHTML;
-			if (confirm('remove ' + section_name + ' ?')) {
+			if (confirm(lang.confirm_remove + ' ' + section_name + ' ?')) {
 				var api = new API();
 				api.rm_section(section_name, function() {
 					e_ul.removeChild(e_li);
@@ -308,7 +353,7 @@ function admin_display() {
 		ez_li[ez_li.length - 1].appendChild(e_bt);
 		
 		clear_gallery();
-		alert('The new section will be saved after you added one image or more');
+		alert(lang.warning.before_add);
 		window.history.pushState(null, document.title, '#' +  e_input.value);
 		section = e_input.value;
 		e_input.value = '';
@@ -321,27 +366,13 @@ function admin_display() {
 	//logout
 	e_bt = document.createElement('button');
 	e_bt.appendChild(document.createTextNode('logout'));
-	e_bt.addEventListener('click', function(event) {
+	e_bt.addEventListener(event_str.click, function(event) {
 		localStorage.clear();
 		window.location.replace('.');
 	});
 	e_menu.appendChild(e_bt);
 	
 	//upload files
-	// var e_input_u = document.createElement('input');
-	// 
-	// attr = document.createAttribute('type');
-	// attr.nodeValue = 'file';
-	// e_input_u.setAttributeNode(attr);
-	// 
-	// attr = document.createAttribute('name');
-	// attr.nodeValue = 'imgz';
-	// e_input_u.setAttributeNode(attr);
-	// 
-	// attr = document.createAttribute('multiple');
-	// e_input_u.setAttributeNode(attr);
-	// 
-	// attr = document.createAttribute('class');
 	var classs = 'bt_upload';
 	if (ez_li.length == 0) {
 		classs += ' remove';
@@ -353,20 +384,7 @@ function admin_display() {
 	e_content.appendChild(e_input_u);
 	
 	//progressbar
-	// var e_progressbar = document.createElement('progress');
-	// 
-	// attr = document.createAttribute('class');
-	// attr.nodeValue = 'remove';
-	// e_progressbar.setAttributeNode(attr);
-	// 
-	// attr = document.createAttribute('value');
-	// attr.nodeValue = 0;
-	// e_progressbar.setAttributeNode(attr);
-	// 
-	// attr = document.createAttribute('max');
-	// attr.nodeValue = 100;
-	// e_progressbar.setAttributeNode(attr);
-	var e_progressbar = attach_attribute(document.createElement('progress'), {classs: 'remove', value: '0', max: '100' });
+	var e_progressbar = attach_attribute(document.createElement('progress'), {classs: 'add', value: '0', max: '100' });
 	e_content.appendChild(e_progressbar);
 
 	//handle upload by drag and drop
@@ -396,7 +414,7 @@ function admin_display() {
 	attr.nodeValue = 'bt_upload bt_del remove';
 	e_bt.setAttributeNode(attr);
 	e_bt.appendChild(document.createTextNode('remove'));
-	e_bt.addEventListener('click', function(event) {
+	e_bt.addEventListener(event_str.click, function(event) {
 		var urlz = get_selected_images();
 		var api = new API();
 		api.rm_images(section, urlz, function(response) {
@@ -419,7 +437,7 @@ function admin_display() {
 	
 	function text_convert(html)
 	{
-	   var tmp = document.createElement("div");
+	   var tmp = document.createElement('div');
 	   tmp.innerHTML = html;
 	   return tmp.textContent||tmp.innerText;
 	}
@@ -430,7 +448,7 @@ function admin_display() {
 	attr.nodeValue = 'bt_up';
 	e_bt.setAttributeNode(attr);
 	e_bt.appendChild(document.createTextNode(text_convert('&larr; up')));
-	e_bt.addEventListener('click', function(event) {
+	e_bt.addEventListener(event_str.click, function(event) {
 		var url = get_selected_images()[0],
 				api = new API();
 		api.move_image(section, url, 'up', function(response) {
@@ -447,7 +465,7 @@ function admin_display() {
 	attr.nodeValue = 'bt_down';
 	e_bt.setAttributeNode(attr);
 	e_bt.appendChild(document.createTextNode(text_convert('down &rarr;')));
-	e_bt.addEventListener('click', function(event) {
+	e_bt.addEventListener(event_str.click, function(event) {
 		var url = get_selected_images()[0],
 				api = new API();
 		api.move_image(section, url, 'down', function(response) {
@@ -460,7 +478,7 @@ function admin_display() {
 }
 
 //button close logbox
-document.getElementById('close').addEventListener('click', function(event) {
+document.getElementById('close').addEventListener(event_str.click, function(event) {
 	document.getElementById('logbox').className = 'remove';
 	event.preventDefault ? event.preventDefault() : event.returnValue = false;
 	window.history.pushState(null, document.title, '.#' + section);
@@ -476,9 +494,9 @@ document.getElementById('logbox').addEventListener('submit', function (event) {
 	api.login(login, password, function(result) {
 		if (result.error != undefined) {
 			if (result.error == 401) {
-				alert('error: login/password incorrect');
+				alert(lang.error.login);
 			} else {
-				alert('error: problem api');
+				alert(lang.error.api);
 			}
 		} else {
 			localStorage.setItem('token', result.token);
@@ -518,7 +536,7 @@ function updateProgress(evt) {
 		var e_progress = document.querySelectorAll('progress')[0];
 		
     var percentLoaded = Math.round((evt.loaded / evt.total) * 100);
-
+console.log(nb_files + ' ' + percentLoaded);
 		if (nb_files != 0) {
 			percentLoaded = Math.round((((percentLoaded / 100) / nb_files) + (n_files / nb_files)) * 100);
 		}
@@ -573,7 +591,7 @@ function handleFileSelect(event) {
 
 		for (var file in files) {
 			if (file.type != undefined && !file.type.match('image.*')) {
-				alert('Files must be images');
+				alert(lang.error.not_images);
 				return;
 			}
 		}
@@ -610,7 +628,7 @@ var e_gallery = document.getElementById('gallery'),
 
 /* get obj gallery from json */
 function get_gallery(success) {
-	get_storage('storage/gallery.json', success, function() {
+	get_storage(properties.uri_storage, success, function() {
 		init_admin_panel();
 	});
 }
@@ -648,6 +666,7 @@ if (properties.responsive) {
 var flag = true;
 window.onresize = function() {
 //global	var e_gallery = document.getElementById('gallery');
+	
 	if (e_gallery.offsetWidth > total_width && flag === true && !mql.matches) {
 		add_img_gallery();
 		flag = false;
@@ -689,7 +708,7 @@ function arrow_button(right, canvas_width, img_url, imgz) {
 	attr.nodeValue += 'margin-top: ' + ((window.innerHeight - arrow_height) / 2) + px_str;
 	e_arrow.setAttributeNode(attr);
 	
-	e_arrow.addEventListener('click', function() {
+	e_arrow.addEventListener(event_str.click, function() {
 		e_arrow_click(img_url, imgz, right);
 	});
 	return e_arrow;
@@ -886,7 +905,7 @@ function generate_gallery(imgz, iterator, preload) {
 
 			//image can be selected to be manipulated if user is admin
 			var btz = null;
-			e_img.addEventListener('mouseup', function(event) {
+			e_img.addEventListener(event_str.start, function(event) {
 				var elem = event.target.parentNode,
 						token = localStorage.getItem('token');
 						
@@ -916,10 +935,10 @@ function generate_gallery(imgz, iterator, preload) {
 			
 			//display image fullscreen
 			var old_click_position = '';
-			e_img.addEventListener('mousedown', function(event) {
+			e_img.addEventListener(event_str.end, function(event) {
 				old_click_position = event.screenX + ',' + event.screenY;
 			});
-			e_img.addEventListener('mouseup', function(event) {
+			e_img.addEventListener(event_str.start, function(event) {
 				var	token = localStorage.getItem('token');
 				if ((token == undefined || token == null)
 						&& properties.fullscreen
@@ -928,7 +947,7 @@ function generate_gallery(imgz, iterator, preload) {
 					var e_full = document.getElementById('fullscreen');
 					e_full.className = 'add';
 					
-					e_full.addEventListener('click', function(event) { //quit fullscreen
+					e_full.addEventListener(event_str.click, function(event) { //quit fullscreen
 						if (event.target.className.indexOf('arrow') != -1) { //we verify the user didn't clicked on an arrow
 							return false;
 						}
@@ -955,8 +974,11 @@ function generate_gallery(imgz, iterator, preload) {
 			disable_scroll = false;
 	
 			//add another image if there is space to fill on the block
-			total_width += resized_img.width;
-			total_height += resized_img.height;
+			if (preload == undefined || preload === false) {
+				
+				total_width += resized_img.width;
+				total_height += resized_img.height;
+			}
 
 			// chose side depending on screen orientation
 			var total_size, gallery_size;
@@ -1027,7 +1049,7 @@ function add_menu_section(name, e_menu, e_ul) {
 	e_a_attr.nodeValue = '#' + name;
 	e_a.setAttributeNode(e_a_attr);
 	
-	e_a.addEventListener('click', function() {
+	e_a.addEventListener(event_str.click, function() {
 		section = name;
 
 		//add section's imgages to gallery
