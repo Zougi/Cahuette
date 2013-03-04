@@ -675,7 +675,7 @@ var flag = true;
 window.onresize = function() {
 //global	var e_gallery = document.getElementById('gallery');
 	
-	if (e_gallery.offsetWidth > total_width && flag === true && !mql.matches) {
+	if (e_gallery.offsetWidth > total_width && flag && !mql.matches) {
 		add_img_gallery();
 		flag = false;
 	}
@@ -841,7 +841,8 @@ function e_arrow_click(img_url, imgz, right) {
 	}
 }
 
-var s_offsetX = 0,
+var old_url,
+		s_offsetX = 0,
 		arrow_width = 60,
 		arrow_height = 180,
 		arrow_margin = 20,
@@ -855,11 +856,12 @@ function generate_gallery(imgz, iterator, preload) {
 		total_width = 0;
 		total_height = 0;
 		clear_gallery();
+		old_url = [];
 		g_preload = [];
 	}
 	
 	//display loader
-	if ((preload == undefined || preload === false) && (imgz.length != iterator + 1)) {
+	if ((preload == undefined || !preload) && (imgz.length != iterator + 1)) {
 		e_load.className = e_load.className.replace(/add_inline|add|remove/, '');
 	  e_load.className += ' ' + (mql.matches ? 'add' : 'add_inline');	
 	} 
@@ -868,7 +870,7 @@ function generate_gallery(imgz, iterator, preload) {
 			
 	if (img != undefined) {
 
-		if (preload == undefined || preload === false) {
+		if (preload == undefined || !preload) {
 			nb_image_processed = iterator + 1;
 		}
 		
@@ -973,7 +975,7 @@ function generate_gallery(imgz, iterator, preload) {
 			});
 	
 			//insert the image at last position
-			if (!(preload == undefined || preload === false)) {
+			if (!(preload == undefined || !preload)) {
 				g_preload.push(e_img);
 			} else {
 				//if we are in preloading mode, get the first element of the queu. if not get the current image
@@ -984,13 +986,17 @@ function generate_gallery(imgz, iterator, preload) {
 				//check if images are already displayed
 				if (img_inNodeList(src, document.querySelectorAll('.img')) == -1) {
 					
-						//display the image
-						g_gallery.insertBefore(img, e_load);
+
+						if (old_url.indexOf(this.src) == -1) { //check is the image isnt already there. should be unnessary bu
+							//display the image
+							g_gallery.insertBefore(img, e_load);
+							old_url.push(this.src);
+						}
 				}
 			}
 	
 			// if images are in the preload queu, dont increment the size(s) queu
-			if (preload == undefined || preload === false) {
+			if (preload == undefined || !preload) {
 				
 				//total size queu of images displayed (height / width) 
 				total_width += resized_img.width;
@@ -1013,7 +1019,7 @@ function generate_gallery(imgz, iterator, preload) {
 				//add another image if there is space to fill on the block
 				if (total_size < gallery_size) {
 					generate_gallery(imgz, ++iterator);
-				} else if (preload == undefined || preload === true) {
+				} else if (preload == undefined || preload) {
 					var _preload = true;
 					//restitute previous nb of images ... delay preload
 					if (pos != null && nb_image_processed < pos.nb_img) {
