@@ -674,8 +674,7 @@ if (properties.responsive) {
 var flag = true;
 window.onresize = function() {
 //global	var e_gallery = document.getElementById('gallery');
-	
-	if (e_gallery.offsetWidth > total_width && flag && !mql.matches) {
+	if (e_gallery.offsetWidth < total_width && flag && !mql.matches) {
 		add_img_gallery();
 		flag = false;
 	}
