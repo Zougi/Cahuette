@@ -1,6 +1,14 @@
+/**
+ * @fileOverview Cahuete gallery
+ * @author Zg
+ * @version 1
+ * @link http://github.com/Zougi/
+ */
+
 /* -------------------------- MaxPhotographer - Default Properties -------------------------- */
 var gallery = (function () {
 
+//general properties of Cahuette
 var properties = {
 	admin: true, //enable the admin interface
 	fullscreen: true, //tap on an image to display it fullscreen
@@ -23,9 +31,6 @@ var lang = {
 	},
 	confirm_remove: 'remove',
 	new_category: 'New Category',
-	error: {
-		new_category: "Supply a category name"
-	},
 	warning: {
 		before_add: 'The new section will be saved after you added one image or more',
 		no_tag_menu: 'menu not found: a div with id \'menu\' should be declared'
@@ -34,7 +39,9 @@ var lang = {
 		no_tag_gallery: 'gallery not found: a div with id \'gallery\' should be declared',
 		login: 'error: login/password incorrect',
 		api: 'error: problem api',
-		not_images: 'Files must be images'
+		not_images: 'Files must be images',
+		no_deplacement_button: 'deplacement buttons can\'t be desplayed because their is no div with class .bt_up/.bt_down in the dom',
+		new_category: 'Supply a category name'
 	}
 };
 
@@ -158,6 +165,7 @@ var API = function() {}
 
 API.uri = function() { return properties.uri_api; };
 
+//method: string REST definition ('GET', 'POST', 'UPDATE', ...), url, null, callback)
 API.http_request = function(method, url, data, callback, progress) {
 	var xhr = new XMLHttpRequest();
 	xhr.open(method, url, true);
@@ -300,10 +308,10 @@ function admin_display() {
 		e_bt.addEventListener(event_str.click, function(event) {
 			var e_li = event.target.parentNode;
 			var section_name = e_li.getElementsByTagName('a')[0].innerHTML;
-			if (confirm(lang.confirm_remove + ' ' + section_name + ' ?')) {
+			if (confirm(lang.confirm_remove + ' ' + section_name + ' ?')) { //alert for user's confirmation of the remove action
 				var api = new API();
 				api.rm_section(section_name, function(response) {
-					if (section_name == section) {
+					if (section_name == section) { //if the current section is the one to delete, reload the page, else just remove the link
 						if (response.error == undefined) {
 							window.location.reload(true);
 						}
@@ -894,7 +902,9 @@ function generate_gallery(imgz, iterator, preload) {
 			//resize image to canvas
 			var resized_img = (
 				mql.matches
+				//portrait view
 				? img_resize(event.target, null, window.innerWidth)
+				//lanscape view. 
 				: img_resize(event.target,  (window.innerHeight > landscape_default_height && properties.auto_fit)
 																					? (properties.max_height == 0 || properties.max_height > window.innerHeight * 0.8)
 																															? window.innerHeight * 0.8
@@ -904,25 +914,29 @@ function generate_gallery(imgz, iterator, preload) {
 			e_img.appendChild(resized_img);
 
 			//image can be selected to be manipulated if user is admin
-			var btz = null;
 			e_img.addEventListener(event_str.start, function(event) {
-				var elem = event.target.parentNode,
-						token = localStorage.getItem('token');
+				var token = localStorage.getItem('token');
 						
 				if (properties.admin && token != undefined && token != null && (s_offsetX == 0 || s_offsetX == offsetX)) { //double click to select img
+					var elem = event.target.parentNode;
+					
+					//display the dashed-borders
 					if (elem.childNodes.length == 1) {
 						elem.appendChild(document.createElement('span'));
-					} else {
+					} else { //remove the borders
 						elem.removeChild(elem.lastChild);
 					}
-					if (btz == null) {
-						btz = document.querySelectorAll('.bt_up, .bt_down');
+					var btz = document.querySelectorAll('.bt_up, .bt_down'),
+					 		nbr_imgz = (get_selected_images()).length;
+					if (btz != null) {
+						for (var i = 0; i < btz.length; i++) {
+							btz[i].className = btz[i].className.replace(/add_inline|remove/, '')
+																	+ ' ' + (nbr_imgz == 1 ? 'add_inline' : 'remove');
+						}
+					} else {
+						console.log(lang.warning.no_deplacement_button);
 					}
-					var nbr_imgz = (get_selected_images()).length;
-					for (var i = 0; i < btz.length; i++) {
-						btz[i].className = btz[i].className.replace(/add_inline|remove/, '')
-																+ ' ' + (nbr_imgz == 1 ? 'add_inline' : 'remove');
-					}
+
 					var del = document.querySelectorAll('.bt_del')[0];
 					if (nbr_imgz > 0) {
 						del.className = del.className.replace(/add_inline|remove/, '');
@@ -964,18 +978,23 @@ function generate_gallery(imgz, iterator, preload) {
 			if (!(preload == undefined || preload === false)) {
 				g_preload.push(e_img);
 			} else {
+				//if we are in preloading mode, get the first element of the queu. if not get the current image
 				var img = (g_preload.length > 0) ? g_preload.shift() : e_img;
 
 				var src = this.src.substr(this.src.lastIndexOf('/') + 1);
+				
+				//check if images are already displayed
 				if (img_inNodeList(src, document.querySelectorAll('.img')) == -1) {
+					
+						//display the image
 						g_gallery.insertBefore(img, e_load);
 				}
 			}
-			disable_scroll = false;
 	
-			//add another image if there is space to fill on the block
+			// if images are in the preload queu, dont increment the size(s) queu
 			if (preload == undefined || preload === false) {
 				
+				//total size queu of images displayed (height / width) 
 				total_width += resized_img.width;
 				total_height += resized_img.height;
 			}
@@ -993,6 +1012,7 @@ function generate_gallery(imgz, iterator, preload) {
 			// if there is space to fill on the gallery and still images in it: add an image
 			if (imgz.length != iterator + 1) {
 				
+				//add another image if there is space to fill on the block
 				if (total_size < gallery_size) {
 					generate_gallery(imgz, ++iterator);
 				} else if (preload == undefined || preload === true) {
@@ -1062,15 +1082,12 @@ function add_menu_section(name, e_menu, e_ul) {
 	e_ul.appendChild(e_li);
 }
 
-var disable_scroll = false;
-
 //trigger whenever gallery has been fully scrolled to the right
 var g_gallery = document.getElementById('gallery'), g_preload = [];
 if (g_gallery != null) {
 	g_gallery.addEventListener('scroll', function() {
-		if ((g_gallery.scrollWidth - g_gallery.offsetWidth <= g_gallery.scrollLeft) && !disable_scroll)
+		if ((g_gallery.scrollWidth - g_gallery.offsetWidth <= g_gallery.scrollLeft))
 		{
-			disable_scroll = true;
 			add_img_gallery();
 			flag = true;
 		}
@@ -1104,8 +1121,7 @@ function add_img_gallery() {
 
 window.addEventListener('scroll', function(event) {
 	if (mql.matches) {
-		if ((window.pageYOffset == document.documentElement.scrollHeight - document.documentElement.clientHeight) && !disable_scroll) {
-			disable_scroll = true;
+		if ((window.pageYOffset == document.documentElement.scrollHeight - document.documentElement.clientHeight)) {
 			add_img_gallery();
 		}
 	}

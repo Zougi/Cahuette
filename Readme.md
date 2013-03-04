@@ -33,38 +33,38 @@ Your html must contain the links to the files Cahuette depends on.
 Put in your <head> the style files:
 
 ```html
-$ <link href="css/gallery.landscape.css" rel="stylesheet" type="text/css" />
-$ <link href="css/gallery.portrait.css" rel="stylesheet" type="text/css" media="only screen and (max-width:480px)" />
+<link href="css/gallery.landscape.css" rel="stylesheet" type="text/css" />
+<link href="css/gallery.portrait.css" rel="stylesheet" type="text/css" media="only screen and (max-width:480px)" />
 ```
 
 Put in the <body>:
 ```html
-$ <div id="gallery"></div><!-- Menu is of course optional but recommended -->
-$ <div id="menu"></div> <!-- Menu is of course optional but recommended. it allows user to switch between sections -->
+<div id="gallery"></div><!-- Menu is of course optional but recommended -->
+<div id="menu"></div> <!-- Menu is of course optional but recommended. it allows user to switch between sections -->
 ```
 
 Put after the </body>:
 ```html
-$<script src="js/gallery.js"></script>
-$<script>
-$  //gallery component
-$  gallery();
-$</script>
+<script src="js/gallery.js"></script>
+<script>
+  //gallery component
+  gallery();
+</script>
 ```
 To change the properties of the gallery, pass a javascript object to the function 'gallery(..);' with some of the following options:
 ```javascript
-$gallery({
-$	admin: true, //enable the admin interface
-$	fullscreen: true, //tap on an image to display it fullscreen
-$	drag: true, //allow user to scroll the gallery by dragging the images
-$	responsive: true, //activate smartphone view (portrait)
-$	remember_scroll_position: true, //reset the scroll position after page reload or switch of section 
-$	min_height: 540, //minimum height of the gallery container
-$	max_height: 0, //if defined, set a maximum resizement height for gallery container. (auto_fit must be enabled)
-$	auto_fit: true, //autofit option is enabled max_height = window.innerHeight
-$	uri_api: 'api/' //default url of the api is 'api/'
-$ uri_storage: 'storage/gallery.json'//default url to get the images datas is 'storage/gallery.json'
-$});
+gallery({
+	admin: true, //enable the admin interface
+	fullscreen: true, //tap on an image to display it fullscreen
+	drag: true, //allow user to scroll the gallery by dragging the images
+	responsive: true, //activate smartphone view (portrait)
+	remember_scroll_position: true, //reset the scroll position after page reload or switch of section 
+	min_height: 540, //minimum height of the gallery container
+	max_height: 0, //if defined, set a maximum resizement height for gallery container. (auto_fit must be enabled)
+	auto_fit: true, //autofit option is enabled max_height = window.innerHeight
+	uri_api: 'api/' //default url of the api is 'api/'
+ uri_storage: 'storage/gallery.json'//default url to get the images datas is 'storage/gallery.json'
+});
 ```
 The values on this example are the default ones.
 
@@ -78,8 +78,8 @@ Make sure "storage/gallery.json" is writable (chmod 666). Make sure the "gallery
 Edit $def_login and $def_password in api/user/login.php
 
 ```php
-$$def_login = 'login';
-$$def_password = 'password';
+$def_login = 'login';
+$def_password = 'password';
 ```
 
 Cahuete API has been tested on php 5.4.4
@@ -108,8 +108,8 @@ Note: The images will be uploaded to the section you are viewing
 
 ## How to contribute ##
 
-I generate the gallery.min.js using the command 'make' which call the program 'uglifyjs'.
-For any push request, please don't change the code syntax (I mean changing tabs, addind useless new lines), it makes the commit hard to read.
+I use the command 'make' to generate the gallery.min.js from gallery.js with 'uglifyjs'.
+For any push request, please make the less change possible on the code syntax (I mean changing tabs, adding new lines), it makes the commit's relevant changes hard to find.
 
 ## License ##
 
