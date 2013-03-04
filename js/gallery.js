@@ -630,7 +630,7 @@ function handleFileSelect(event) {
 
 var landscape_default_height = properties.min_height,
 		uri_login = 'login', stop_loading = false;
-var gallery, section, total_width, total_height, nb_image_processed, old_url;
+var gallery, section, total_width, total_height, nb_image_processed;
 var e_gallery = document.getElementById('gallery'),
 		e_load = document.getElementById('load_gallery');
 
@@ -855,7 +855,6 @@ function generate_gallery(imgz, iterator, preload) {
 		total_width = 0;
 		total_height = 0;
 		clear_gallery();
-		old_url = [];
 		g_preload = [];
 	}
 	
@@ -867,13 +866,12 @@ function generate_gallery(imgz, iterator, preload) {
 	var img =  imgz[iterator],
 			n_img = new Image();
 			
-	if (img != undefined && old_url.indexOf(img.url) == -1) {
+	if (img != undefined) {
 
 		if (preload == undefined || preload === false) {
 			nb_image_processed = iterator + 1;
 		}
 		
-		old_url = img.url;
 		n_img.onload = function(event) {
 			if (stop_loading) {
 				stop_loading = false;
