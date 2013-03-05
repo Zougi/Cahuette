@@ -50,7 +50,8 @@ var event_str = ('ontouchstart' in document) ? {
 	click: 'touchstart',
 	start: 'touchstart',
 	end: 'touchend',
-	hover: null
+	hover: null,
+	scroll: 'touchend'
 } : {
 	click: 'click',
 	start: 'mouseup',
@@ -58,7 +59,8 @@ var event_str = ('ontouchstart' in document) ? {
 	hover: {
 		start: 'mouseenter',
 		end: 'mouseleave'
-	}
+	},
+	scroll: 'scroll'
 };
 
 //fill default properties with passed ones
@@ -1088,7 +1090,7 @@ function add_menu_section(name, e_menu, e_ul) {
 //trigger whenever gallery has been fully scrolled to the right
 var g_gallery = document.getElementById('gallery'), g_preload = [];
 if (g_gallery != null) {
-	g_gallery.addEventListener('scroll', function() {
+	g_gallery.addEventListener(event_str.scroll, function() {
 		if ((g_gallery.scrollWidth - g_gallery.offsetWidth <= g_gallery.scrollLeft))
 		{
 			add_img_gallery();
