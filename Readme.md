@@ -30,20 +30,20 @@ The component requires the files : js/gallery.min.js, css/gallery.landscape.css,
 
 Your html must contain the links to the files Cahuette depends on.
 
-Put in your <head> the style files:
+Put between your head tags the style files:
 
 ```html
 <link href="css/gallery.landscape.css" rel="stylesheet" type="text/css" />
 <link href="css/gallery.portrait.css" rel="stylesheet" type="text/css" media="only screen and (max-width:480px)" />
 ```
 
-Put in the <body>:
+Put in the body tag:
 ```html
 <div id="gallery"></div><!-- Menu is of course optional but recommended -->
 <div id="menu"></div> <!-- Menu is of course optional but recommended. it allows user to switch between sections -->
 ```
 
-Put after the </body>:
+Put after the end of body tag:
 ```html
 <script src="js/gallery.js"></script>
 <script>
