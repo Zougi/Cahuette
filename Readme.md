@@ -37,7 +37,7 @@ Put between your head tags the style files:
 <link href="css/gallery.portrait.css" rel="stylesheet" type="text/css" media="only screen and (max-width:480px)" />
 ```
 
-Put in the body tag:
+Put after the body tag:
 ```html
 <div id="gallery"></div><!-- Menu is of course optional but recommended -->
 <div id="menu"></div> <!-- Menu is of course optional but recommended. it allows user to switch between sections -->
